@@ -42,7 +42,9 @@ public class InfiniteMapGenerator : MonoBehaviour
     float lastY;
     float bgLastX;
 
-    // Difficulty variables
+    int seed;
+
+    // Difficulty
     int trapChance = 20;
     float heightVariation = 0.7f;
     int islandChance = 20;
@@ -50,6 +52,9 @@ public class InfiniteMapGenerator : MonoBehaviour
 
     void Start()
     {
+        seed = GameManager.instance.mapSeed;
+        Random.InitState(seed);
+
         SetDifficulty();
 
         lastX = player.position.x;
@@ -72,7 +77,9 @@ public class InfiniteMapGenerator : MonoBehaviour
 
     void SetDifficulty()
     {
-        if (DifficultyManager.difficulty == 0) // EASY
+        int diff = GameManager.instance.difficulty;
+
+        if (diff == 0) // EASY
         {
             trapChance = 5;
             heightVariation = 0.3f;
@@ -80,7 +87,7 @@ public class InfiniteMapGenerator : MonoBehaviour
             platformChance = 20;
         }
 
-        if (DifficultyManager.difficulty == 1) // NORMAL
+        if (diff == 1) // NORMAL
         {
             trapChance = 20;
             heightVariation = 0.7f;
@@ -88,7 +95,7 @@ public class InfiniteMapGenerator : MonoBehaviour
             platformChance = 30;
         }
 
-        if (DifficultyManager.difficulty == 2) // HARD
+        if (diff == 2) // HARD
         {
             trapChance = 40;
             heightVariation = 1.2f;
@@ -130,26 +137,33 @@ public class InfiniteMapGenerator : MonoBehaviour
         int randomType = Random.Range(0, 100);
 
         GameObject tile = null;
+        bool isIsland = false;
 
         if (randomType < 50 && groundPrefabs.Length > 0)
+        {
             tile = SpawnPrefab(groundPrefabs, spawnPos);
-
+        }
         else if (randomType < 50 + platformChance && platformPrefabs.Length > 0)
+        {
             tile = SpawnPrefab(platformPrefabs, spawnPos);
-
+        }
         else if (randomType < 50 + platformChance + islandChance && islandPrefabs.Length > 0)
+        {
             tile = SpawnPrefab(islandPrefabs, spawnPos + Vector3.up * 2f);
-
+            isIsland = true;
+        }
         else
+        {
             tile = SpawnPrefab(groundPrefabs, spawnPos);
+        }
 
         if (tile != null && lastX > coinStartDistance)
         {
             int chance = Random.Range(0, 100);
 
-            if (tile.CompareTag("Island"))
+            if (isIsland)
             {
-                if (chance < 10)
+                if (chance < 15)
                     SpawnCoinGroup(tile);
             }
             else
@@ -159,13 +173,18 @@ public class InfiniteMapGenerator : MonoBehaviour
             }
         }
 
-        SpawnTrap(spawnPos);
+        if (!isIsland)
+        {
+            SpawnTrap(spawnPos);
+        }
 
         lastY = randomY;
     }
 
     GameObject SpawnPrefab(GameObject[] list, Vector3 pos)
     {
+        if (list.Length == 0) return null;
+
         GameObject prefab = list[Random.Range(0, list.Length)];
         return Instantiate(prefab, pos, Quaternion.identity);
     }
@@ -189,7 +208,6 @@ public class InfiniteMapGenerator : MonoBehaviour
         if (coinPrefab == null) return;
 
         Vector3 basePos = tile.transform.position;
-
         float baseHeight = basePos.y + 2.8f;
 
         int pattern = Random.Range(0, 4);
@@ -232,7 +250,7 @@ public class InfiniteMapGenerator : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             float x = basePos.x - 2 + i * 1f;
-            float y = height + Mathf.Sin(i * Mathf.PI / (count - 1)) * 1f;
+            float y = height + Mathf.Sin(i * Mathf.PI / (count - 1));
 
             Instantiate(coinPrefab, new Vector3(x, y, 0), Quaternion.identity);
         }
