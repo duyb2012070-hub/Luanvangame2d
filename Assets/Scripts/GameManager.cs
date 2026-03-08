@@ -12,6 +12,8 @@ public class GameManager : MonoBehaviour
     public int score;
 
     public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI finalScoreText; // ⭐ TEXT HIEN FINAL SCORE
+
     public int mapSeed;
     public int difficulty;
 
@@ -20,18 +22,40 @@ public class GameManager : MonoBehaviour
 
     bool isPaused;
 
+    // ❤️ PLAYER HEARTS
+    public int maxHearts = 3;
+    public int currentHearts;
+
+    // 🚩 CHECKPOINT
+    Vector3 lastCheckpoint;
+    bool hasCheckpoint = false;
+
     void Awake()
     {
+        Time.timeScale = 1f;
+
         if (instance == null)
             instance = this;
         else
             Destroy(gameObject);
     }
 
+    public AudioSource music;
+
+    public void SetVolume(float volume)
+    {
+        music.volume = volume;
+    }
+
     void Start()
     {
         LoadGame(1);
         UpdateScore();
+
+        currentHearts = maxHearts;
+
+        if (player != null)
+            lastCheckpoint = player.position;
 
         if (loadSlot != -1)
         {
@@ -63,6 +87,66 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // 🚩 SET CHECKPOINT
+
+    public void SetCheckpoint(Vector3 pos)
+    {
+        lastCheckpoint = pos;
+        hasCheckpoint = true;
+
+        Debug.Log("Checkpoint Saved: " + pos);
+    }
+
+    // ❤️ DAMAGE FROM TRAP
+
+    public void TakeDamage()
+    {
+        currentHearts--;
+
+        Debug.Log("Hearts left: " + currentHearts);
+
+        if (currentHearts <= 0)
+        {
+            RespawnOrGameOver();
+        }
+    }
+
+    // 🌋 PLAYER FALL
+
+    public void PlayerFall()
+    {
+        Debug.Log("Player Fell");
+
+        RespawnOrGameOver();
+    }
+
+    // 🚩 RESPAWN OR GAME OVER
+
+    void RespawnOrGameOver()
+    {
+        if (hasCheckpoint)
+        {
+            RespawnPlayer();
+        }
+        else
+        {
+            GameOver();
+        }
+    }
+
+    // 🚩 RESPAWN PLAYER
+
+    public void RespawnPlayer()
+    {
+        if (player == null) return;
+
+        player.position = lastCheckpoint + new Vector3(0, 2f, 0);
+
+        currentHearts = maxHearts;
+
+        Debug.Log("Respawn at checkpoint");
+    }
+
     // SCORE
 
     public void AddScore(int amount)
@@ -70,22 +154,16 @@ public class GameManager : MonoBehaviour
         score += amount;
         UpdateScore();
 
-        // ===== ACHIEVEMENT CHECK =====
-
         if (score >= 50)
         {
             if (DatabaseManager.Instance != null)
-            {
                 DatabaseManager.Instance.UnlockAchievement("Collect 50 Coins");
-            }
         }
 
         if (score >= 100)
         {
             if (DatabaseManager.Instance != null)
-            {
                 DatabaseManager.Instance.UnlockAchievement("Run 100m");
-            }
         }
     }
 
@@ -134,7 +212,11 @@ public class GameManager : MonoBehaviour
                     data.posY,
                     data.posZ
                 );
+
+                lastCheckpoint = player.position;
             }
+
+            UpdateScore();
         }
     }
 
@@ -164,6 +246,10 @@ public class GameManager : MonoBehaviour
     {
         if (gameOverPanel != null)
             gameOverPanel.SetActive(true);
+
+        // ⭐ HIEN FINAL SCORE
+        if (finalScoreText != null)
+            finalScoreText.text = "Final Score: " + score;
 
         Time.timeScale = 0f;
     }

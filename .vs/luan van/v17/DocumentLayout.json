@@ -3,16 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\D\\luan van\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{9BF551F5-4A4D-0442-AFFE-4EE00E23F3C3}|Assembly-CSharp.csproj|C:\\Users\\D\\luan van\\assets\\scripts\\gamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9BF551F5-4A4D-0442-AFFE-4EE00E23F3C3}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9BF551F5-4A4D-0442-AFFE-4EE00E23F3C3}|Assembly-CSharp.csproj|C:\\Users\\D\\luan van\\assets\\scripts\\playercollision.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9BF551F5-4A4D-0442-AFFE-4EE00E23F3C3}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\playercollision.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{9BF551F5-4A4D-0442-AFFE-4EE00E23F3C3}|Assembly-CSharp.csproj|c:\\users\\d\\luan van\\assets\\scripts\\databasemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9BF551F5-4A4D-0442-AFFE-4EE00E23F3C3}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\databasemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{9BF551F5-4A4D-0442-AFFE-4EE00E23F3C3}|Assembly-CSharp.csproj|C:\\Users\\D\\luan van\\assets\\scripts\\infinitemapgenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9BF551F5-4A4D-0442-AFFE-4EE00E23F3C3}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\infinitemapgenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9BF551F5-4A4D-0442-AFFE-4EE00E23F3C3}|Assembly-CSharp.csproj|C:\\Users\\D\\luan van\\assets\\scripts\\gamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9BF551F5-4A4D-0442-AFFE-4EE00E23F3C3}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{9BF551F5-4A4D-0442-AFFE-4EE00E23F3C3}|Assembly-CSharp.csproj|C:\\Users\\D\\luan van\\assets\\scripts\\continuemenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -51,10 +55,6 @@
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\music.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9BF551F5-4A4D-0442-AFFE-4EE00E23F3C3}|Assembly-CSharp.csproj|C:\\Users\\D\\luan van\\assets\\scripts\\playercollision.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9BF551F5-4A4D-0442-AFFE-4EE00E23F3C3}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\playercollision.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{9BF551F5-4A4D-0442-AFFE-4EE00E23F3C3}|Assembly-CSharp.csproj|C:\\Users\\D\\luan van\\assets\\scripts\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9BF551F5-4A4D-0442-AFFE-4EE00E23F3C3}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
@@ -66,24 +66,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "DatabaseManager.cs",
-              "DocumentMoniker": "C:\\Users\\D\\luan van\\Assets\\Scripts\\DatabaseManager.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\DatabaseManager.cs",
-              "ToolTip": "C:\\Users\\D\\luan van\\Assets\\Scripts\\DatabaseManager.cs",
-              "RelativeToolTip": "Assets\\Scripts\\DatabaseManager.cs",
-              "ViewState": "AgIAAAUAAAAAAAAAAAAiwB8AAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-08T09:44:16.877Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "music.cs",
               "DocumentMoniker": "C:\\Users\\D\\luan van\\Assets\\Scripts\\music.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\music.cs",
@@ -95,7 +82,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "ContinueMenu.cs",
               "DocumentMoniker": "C:\\Users\\D\\luan van\\Assets\\Scripts\\ContinueMenu.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\ContinueMenu.cs",
@@ -107,7 +94,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "SaveData.cs",
               "DocumentMoniker": "C:\\Users\\D\\luan van\\Assets\\Scripts\\SaveData.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\SaveData.cs",
@@ -119,7 +106,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "MainMenu.cs",
               "DocumentMoniker": "C:\\Users\\D\\luan van\\Assets\\Scripts\\MainMenu.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\MainMenu.cs",
@@ -131,7 +118,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "ResolutionSettings.cs",
               "DocumentMoniker": "C:\\Users\\D\\luan van\\Assets\\Scripts\\ResolutionSettings.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\ResolutionSettings.cs",
@@ -143,7 +130,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "SettingsMenu.cs",
               "DocumentMoniker": "C:\\Users\\D\\luan van\\Assets\\Scripts\\SettingsMenu.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\SettingsMenu.cs",
@@ -155,19 +142,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "GameManager.cs",
               "DocumentMoniker": "C:\\Users\\D\\luan van\\Assets\\Scripts\\GameManager.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\GameManager.cs",
               "ToolTip": "C:\\Users\\D\\luan van\\Assets\\Scripts\\GameManager.cs",
               "RelativeToolTip": "Assets\\Scripts\\GameManager.cs",
-              "ViewState": "AgIAAAsAAAAAAAAAAAAQwCgAAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAQwCMAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-07T05:45:08.086Z"
+              "WhenOpened": "2026-03-07T05:45:08.086Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "InfiniteMapGenerator.cs",
               "DocumentMoniker": "C:\\Users\\D\\luan van\\Assets\\Scripts\\InfiniteMapGenerator.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\InfiniteMapGenerator.cs",
@@ -178,12 +166,8 @@
               "WhenOpened": "2026-03-06T15:39:29.079Z"
             },
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
-            },
-            {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "GameplayMusicPlayer.cs",
               "DocumentMoniker": "C:\\Users\\D\\luan van\\Assets\\Scripts\\GameplayMusicPlayer.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\GameplayMusicPlayer.cs",
@@ -195,7 +179,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "MenuMusicPlayer.cs",
               "DocumentMoniker": "C:\\Users\\D\\luan van\\Assets\\Scripts\\MenuMusicPlayer.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\MenuMusicPlayer.cs",
@@ -207,19 +191,37 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 1,
               "Title": "PlayerCollision.cs",
               "DocumentMoniker": "C:\\Users\\D\\luan van\\Assets\\Scripts\\PlayerCollision.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\PlayerCollision.cs",
               "ToolTip": "C:\\Users\\D\\luan van\\Assets\\Scripts\\PlayerCollision.cs",
               "RelativeToolTip": "Assets\\Scripts\\PlayerCollision.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB8AAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAwwCUAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-07T05:42:03.865Z"
+              "WhenOpened": "2026-03-07T05:42:03.865Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 2,
+              "Title": "DatabaseManager.cs",
+              "DocumentMoniker": "C:\\Users\\D\\luan van\\Assets\\Scripts\\DatabaseManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\DatabaseManager.cs",
+              "ToolTip": "C:\\Users\\D\\luan van\\Assets\\Scripts\\DatabaseManager.cs",
+              "RelativeToolTip": "Assets\\Scripts\\DatabaseManager.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAA2wB8AAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-08T09:44:16.877Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
               "Title": "SaveSystem.cs",
               "DocumentMoniker": "C:\\Users\\D\\luan van\\Assets\\Scripts\\SaveSystem.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\SaveSystem.cs",

@@ -13,20 +13,26 @@ public class PlayerCollision : MonoBehaviour
 
     void Update()
     {
-        // Nếu player rơi khỏi map
+        // Rơi khỏi map -> chết luôn
         if (transform.position.y < fallLimit)
         {
-            gameManager.GameOver();
+            GameManager.instance.PlayerFall();
         }
     }
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        // Ăn coin
+        // Coin
         if (collision.CompareTag("Coin"))
         {
             Destroy(collision.gameObject);
             gameManager.AddScore(1);
+        }
+
+        // Trap -> mất 1 tim
+        if (collision.CompareTag("Trap"))
+        {
+            gameManager.TakeDamage();
         }
     }
 }
