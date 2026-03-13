@@ -19,6 +19,7 @@ public class PlayerCollision : MonoBehaviour
 
     void Update()
     {
+        // kiểm tra rơi khỏi map
         if (!isDead && transform.position.y < fallLimit)
         {
             isDead = true;
@@ -32,26 +33,47 @@ public class PlayerCollision : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
+        // ăn coin
         if (collision.CompareTag("Coin"))
         {
             if (coinSound != null)
                 coinSound.PlayOneShot(coinSound.clip);
 
             Destroy(collision.gameObject);
-            gameManager.AddScore(1);
+
+            if (gameManager != null)
+                gameManager.AddScore(1);
         }
 
+        // dính trap
         if (collision.CompareTag("Trap") && !isDead)
         {
             if (trapSound != null)
                 trapSound.PlayOneShot(trapSound.clip);
 
-            gameManager.TakeDamage();
+            isDead = true;
+
+            if (gameManager != null)
+                gameManager.TakeDamage();
+
+            // reset trạng thái sau khi respawn
+            Invoke(nameof(ResetDeathState), 0.5f);
         }
     }
 
     void PlayerFallDelay()
     {
-        GameManager.instance.PlayerFall();
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.PlayerFall();
+        }
+
+        // reset trạng thái để lần sau còn rơi tiếp được
+        Invoke(nameof(ResetDeathState), 0.5f);
+    }
+
+    void ResetDeathState()
+    {
+        isDead = false;
     }
 }
