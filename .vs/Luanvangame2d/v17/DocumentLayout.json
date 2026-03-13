@@ -3,10 +3,6 @@
   "WorkspaceRootPath": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\MainMenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\MainMenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\InfiniteMapGenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\InfiniteMapGenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -15,20 +11,8 @@
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\DifficultyManager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\NameInputHandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\NameInputHandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\GameManager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\GameManager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\PlayerProfileManager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\PlayerProfileManager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\PlayerCollision.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\PlayerCollision.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -38,11 +22,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "DifficultyManager.cs",
               "DocumentMoniker": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\DifficultyManager.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\DifficultyManager.cs",
@@ -50,51 +34,24 @@
               "RelativeToolTip": "Assets\\Scripts\\DifficultyManager.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-08T02:14:31.325Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-08T02:14:31.325Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "InfiniteMapGenerator.cs",
               "DocumentMoniker": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\InfiniteMapGenerator.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\InfiniteMapGenerator.cs",
               "ToolTip": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\InfiniteMapGenerator.cs",
               "RelativeToolTip": "Assets\\Scripts\\InfiniteMapGenerator.cs",
-              "ViewState": "AgIAAPYAAAAAAAAAAAAUwBABAAABAAAAAAAAAA==",
+              "ViewState": "AgIAALQAAAAAAAAAAAAAAHUAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-08T02:09:44.709Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "MainMenu.cs",
-              "DocumentMoniker": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\MainMenu.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\MainMenu.cs",
-              "ToolTip": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\MainMenu.cs",
-              "RelativeToolTip": "Assets\\Scripts\\MainMenu.cs",
-              "ViewState": "AgIAABoAAAAAAAAAAAAUwDQAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-08T00:27:54.354Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "NameInputHandler.cs",
-              "DocumentMoniker": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\NameInputHandler.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\NameInputHandler.cs",
-              "ToolTip": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\NameInputHandler.cs",
-              "RelativeToolTip": "Assets\\Scripts\\NameInputHandler.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-08T00:17:30.978Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 2,
               "Title": "GameManager.cs",
               "DocumentMoniker": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\GameManager.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\GameManager.cs",
@@ -102,34 +59,7 @@
               "RelativeToolTip": "Assets\\Scripts\\GameManager.cs",
               "ViewState": "AgIAAGoAAAAAAAAAAAAQwIQAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-08T00:13:14.521Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "PlayerProfileManager.cs",
-              "DocumentMoniker": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\PlayerProfileManager.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\PlayerProfileManager.cs",
-              "ToolTip": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\PlayerProfileManager.cs",
-              "RelativeToolTip": "Assets\\Scripts\\PlayerProfileManager.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-08T00:11:59.55Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "PlayerCollision.cs",
-              "DocumentMoniker": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\PlayerCollision.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\PlayerCollision.cs",
-              "ToolTip": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\PlayerCollision.cs",
-              "RelativeToolTip": "Assets\\Scripts\\PlayerCollision.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-07T04:38:59.306Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-08T00:13:14.521Z"
             }
           ]
         }

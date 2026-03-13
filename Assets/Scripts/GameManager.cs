@@ -5,67 +5,166 @@ using TMPro;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    public static int loadSlot = -1;
 
-    [Header("Score")]
-    public int score = 0;
+    public Transform player;
+
+    public int score;
+
     public TextMeshProUGUI scoreText;
-    public TextMeshProUGUI finalScoreText;
+    public TextMeshProUGUI finalScoreText; // ⭐ TEXT HIEN FINAL SCORE
 
-    [Header("UI Panels")]
-    public GameObject gameOverPanel;
+    public int mapSeed;
+    public int difficulty;
+
     public GameObject pausePanel;
+    public GameObject gameOverPanel;
 
-    [Header("Audio")]
-    public AudioSource musicSource;
+    bool isPaused;
 
-    bool isPaused = false;
+    // ❤️ PLAYER HEARTS
+    public int maxHearts = 3;
+    public int currentHearts;
+
+    // 🚩 CHECKPOINT
+    Vector3 lastCheckpoint;
+    bool hasCheckpoint = false;
 
     void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-
         Time.timeScale = 1f;
+
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(gameObject);
+    }
+
+    public AudioSource music;
+
+    public void SetVolume(float volume)
+    {
+        music.volume = volume;
     }
 
     void Start()
     {
+        LoadGame(1);
         UpdateScore();
 
-        if (gameOverPanel != null)
-            gameOverPanel.SetActive(false);
+        currentHearts = maxHearts;
 
-        if (pausePanel != null)
-            pausePanel.SetActive(false);
+        if (player != null)
+            lastCheckpoint = player.position;
+
+        if (loadSlot != -1)
+        {
+            LoadGame(loadSlot);
+            loadSlot = -1;
+        }
     }
 
     void Update()
     {
-        // Bấm ESC để pause / resume
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (gameOverPanel != null && gameOverPanel.activeSelf)
-                return;
-
-            if (pausePanel.activeSelf)
+            if (isPaused)
                 ResumeGame();
             else
                 PauseGame();
         }
+
+        if (Input.GetKeyDown(KeyCode.F5))
+        {
+            SaveGame(0);
+            Debug.Log("GAME SAVED");
+        }
+
+        if (Input.GetKeyDown(KeyCode.F9))
+        {
+            LoadGame(0);
+            Debug.Log("GAME LOADED");
+        }
     }
 
-    //================ SCORE =================
+    // 🚩 SET CHECKPOINT
+
+    public void SetCheckpoint(Vector3 pos)
+    {
+        lastCheckpoint = pos;
+        hasCheckpoint = true;
+
+        Debug.Log("Checkpoint Saved: " + pos);
+    }
+
+    // ❤️ DAMAGE FROM TRAP
+
+    public void TakeDamage()
+    {
+        currentHearts--;
+
+        Debug.Log("Hearts left: " + currentHearts);
+
+        if (currentHearts <= 0)
+        {
+            RespawnOrGameOver();
+        }
+    }
+
+    // 🌋 PLAYER FALL
+
+    public void PlayerFall()
+    {
+        Debug.Log("Player Fell");
+
+        RespawnOrGameOver();
+    }
+
+    // 🚩 RESPAWN OR GAME OVER
+
+    void RespawnOrGameOver()
+    {
+        if (hasCheckpoint)
+        {
+            RespawnPlayer();
+        }
+        else
+        {
+            GameOver();
+        }
+    }
+
+    // 🚩 RESPAWN PLAYER
+
+    public void RespawnPlayer()
+    {
+        if (player == null) return;
+
+        player.position = lastCheckpoint + new Vector3(0, 2f, 0);
+
+        currentHearts = maxHearts;
+
+        Debug.Log("Respawn at checkpoint");
+    }
+
+    // SCORE
 
     public void AddScore(int amount)
     {
         score += amount;
         UpdateScore();
+
+        if (score >= 50)
+        {
+            if (DatabaseManager.Instance != null)
+                DatabaseManager.Instance.UnlockAchievement("Collect 50 Coins");
+        }
+
+        if (score >= 100)
+        {
+            if (DatabaseManager.Instance != null)
+                DatabaseManager.Instance.UnlockAchievement("Run 100m");
+        }
     }
 
     void UpdateScore()
@@ -74,20 +173,54 @@ public class GameManager : MonoBehaviour
             scoreText.text = "Score: " + score;
     }
 
-    //================ GAME OVER =================
+    // SAVE
 
-    public void GameOver()
+    public void SaveGame(int slot)
     {
-        if (gameOverPanel != null)
-            gameOverPanel.SetActive(true);
+        SaveData data = new SaveData();
 
-        if (finalScoreText != null)
-            finalScoreText.text = "Score: " + score;
+        data.score = score;
+        data.mapSeed = mapSeed;
+        data.difficulty = difficulty;
 
-        Time.timeScale = 0f;
+        if (player != null)
+        {
+            data.posX = player.position.x;
+            data.posY = player.position.y;
+            data.posZ = player.position.z;
+        }
+
+        SaveSystem.SaveGame(data, slot);
     }
 
-    //================ PAUSE =================
+    // LOAD
+
+    public void LoadGame(int slot)
+    {
+        SaveData data = SaveSystem.LoadGame(slot);
+
+        if (data != null)
+        {
+            score = data.score;
+            mapSeed = data.mapSeed;
+            difficulty = data.difficulty;
+
+            if (player != null)
+            {
+                player.position = new Vector3(
+                    data.posX,
+                    data.posY,
+                    data.posZ
+                );
+
+                lastCheckpoint = player.position;
+            }
+
+            UpdateScore();
+        }
+    }
+
+    // PAUSE
 
     public void PauseGame()
     {
@@ -107,27 +240,33 @@ public class GameManager : MonoBehaviour
         isPaused = false;
     }
 
-    //================ RESTART =================
+    // GAME OVER
+
+    public void GameOver()
+    {
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(true);
+
+        // ⭐ HIEN FINAL SCORE
+        if (finalScoreText != null)
+            finalScoreText.text = "Final Score: " + score;
+
+        Time.timeScale = 0f;
+    }
+
+    // RESTART
 
     public void RestartGame()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    //================ MAIN MENU =================
+    // MAIN MENU
 
     public void GoToMainMenu()
     {
         Time.timeScale = 1f;
         SceneManager.LoadScene("Main Menu");
-    }
-
-    //================ VOLUME =================
-
-    public void SetVolume(float volume)
-    {
-        if (musicSource != null)
-            musicSource.volume = volume;
     }
 }
