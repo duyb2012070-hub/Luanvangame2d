@@ -3,6 +3,14 @@
   "WorkspaceRootPath": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\MainMenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\MainMenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\transitionbuttonmenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\transitionbuttonmenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\InfiniteMapGenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\InfiniteMapGenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -22,11 +30,37 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainMenu.cs",
+              "DocumentMoniker": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\MainMenu.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\MainMenu.cs",
+              "ToolTip": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\MainMenu.cs",
+              "RelativeToolTip": "Assets\\Scripts\\MainMenu.cs",
+              "ViewState": "AgIAAJwAAAAAAAAAAAAIwMMAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-14T03:25:23.663Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "transitionbuttonmenu.cs",
+              "DocumentMoniker": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\transitionbuttonmenu.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\transitionbuttonmenu.cs",
+              "ToolTip": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\transitionbuttonmenu.cs",
+              "RelativeToolTip": "Assets\\Scripts\\transitionbuttonmenu.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-13T23:14:22.145Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "DifficultyManager.cs",
               "DocumentMoniker": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\DifficultyManager.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\DifficultyManager.cs",
@@ -38,7 +72,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "InfiniteMapGenerator.cs",
               "DocumentMoniker": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\InfiniteMapGenerator.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\InfiniteMapGenerator.cs",
@@ -51,7 +85,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "GameManager.cs",
               "DocumentMoniker": "C:\\Users\\tyty0\\OneDrive\\Desktop\\Luanvangame2d\\Assets\\Scripts\\GameManager.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\GameManager.cs",
