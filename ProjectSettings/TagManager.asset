@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 3
+  tags:
+  - Coin
+  - Trap
+  - Enemy
+  - Heart
+  - Ground
+  - Platform
+  - Checkpoint
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - Ground
+  - GGR
+  - Trap
+  - Enemy
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Player
+    uniqueID: 2446814753
+    locked: 0
+  - name: Ground
+    uniqueID: 4044638815
+    locked: 0
+  - name: Item
+    uniqueID: 257183163
+    locked: 0
+  - name: enemy
+    uniqueID: 2870439407
+    locked: 0
+  - name: UI
+    uniqueID: 3901785079
+    locked: 0
+  - name: New Layer 5
+    uniqueID: 4047245377
+    locked: 0
+  m_RenderingLayers:
+  - Default
