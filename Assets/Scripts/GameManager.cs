@@ -32,8 +32,8 @@ public class GameManager : MonoBehaviour
     Vector3 lastCheckpoint;
     bool hasCheckpoint = false;
 
-    // 👉 CHỐNG SAVE LẶP
-    bool isSaved = false;
+    // 👉 chống gọi GameOver nhiều lần
+    bool isGameOver = false;
 
     void Awake()
     {
@@ -56,7 +56,7 @@ public class GameManager : MonoBehaviour
 
         difficulty = PlayerPrefs.GetInt("difficulty", 0);
 
-        isSaved = false;
+        isGameOver = false;
     }
 
     void Update()
@@ -171,21 +171,22 @@ public class GameManager : MonoBehaviour
     // ================= GAME OVER =================
     public void GameOver()
     {
-        if (!isSaved)
-        {
-            if (AchievementManager.instance != null)
-            {
-                AchievementManager.instance.SaveAchievement("Player");
-                Debug.Log("AUTO SAVED ACHIEVEMENT");
-            }
-            else
-            {
-                Debug.LogWarning("Không tìm thấy AchievementManager!");
-            }
+        // ❗ tránh gọi nhiều lần
+        if (isGameOver) return;
+        isGameOver = true;
 
-            isSaved = true;
+        // 💾 SAVE ACHIEVEMENT
+        if (AchievementManager.instance != null)
+        {
+            AchievementManager.instance.SaveAchievement();
+            Debug.Log("✅ AUTO SAVED ACHIEVEMENT");
+        }
+        else
+        {
+            Debug.LogWarning("❌ Không tìm thấy AchievementManager!");
         }
 
+        // UI
         if (gameOverPanel != null)
             gameOverPanel.SetActive(true);
 
@@ -199,13 +200,32 @@ public class GameManager : MonoBehaviour
     public void RestartGame()
     {
         Time.timeScale = 1f;
+
+        if (AchievementManager.instance != null)
+            AchievementManager.instance.ResetSave(); // reset cho lượt mới
+
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
+    public void GoToScene(string targetSceneName)
+    {
+        // 1. Ghi nhớ cảnh muốn đến vào biến tĩnh của LoadingManager
+        LoadingManager.SceneToLoad = targetSceneName;
 
+        // 2. Mở Scene Loading lên trước
+        SceneManager.LoadScene("LoadingScene");
+    }
     // ================= MAIN MENU =================
     public void GoToMainMenu()
     {
+        // 1. Đảm bảo thời gian trở lại bình thường (nếu game đang Pause)
         Time.timeScale = 1f;
-        SceneManager.LoadScene("Main Menu");
+
+        // 2. Gán tên Scene muốn đến vào biến tĩnh của LoadingManager
+        // Lưu ý: Tên "Main Menu" phải khớp 100% với tên trong Build Settings
+        LoadingManager.SceneToLoad = "Main Menu";
+
+        // 3. Load màn hình Loading trước
+        // Lưu ý: Tên "LoadingSence" phải khớp với tên bạn đặt (có chữ e ở giữa)
+        SceneManager.LoadScene("LoadingSence");
     }
 }
