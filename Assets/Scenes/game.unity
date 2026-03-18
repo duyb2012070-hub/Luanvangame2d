@@ -155,6 +155,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: ed751281a8fd2a847a599b71a1ad2d11, type: 3}
   - {fileID: 8300000, guid: a4bc55ae84059134186cb7595cde72ec, type: 3}
   - {fileID: 8300000, guid: a56e5723368e82948ad107b55d4d2222, type: 3}
+  volumeSlider: {fileID: 233400404}
 --- !u!82 &42917570
 AudioSource:
   m_ObjectHideFlags: 0
@@ -687,7 +688,6 @@ MonoBehaviour:
   gameOverPanel: {fileID: 1088719077}
   maxHearts: 3
   currentHearts: 0
-  music: {fileID: 0}
 --- !u!4 &230375691
 Transform:
   m_ObjectHideFlags: 0
@@ -886,14 +886,14 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0.525
+  m_Value: 0.534
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 230375690}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+      - m_Target: {fileID: 42917569}
+        m_TargetAssemblyTypeName: GameplayMusicPlayer, Assembly-CSharp
         m_MethodName: SetVolume
-        m_Mode: 0
+        m_Mode: 4
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -2426,7 +2426,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 972141032}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 230375690}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: LoadLastCheckpoint
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &972141032
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2575,7 +2587,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1113352776
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2709,7 +2721,7 @@ RectTransform:
   m_Father: {fileID: 877439328}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.525, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -4286,8 +4298,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1153948962}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.525, y: 0}
-  m_AnchorMax: {x: 0.525, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}

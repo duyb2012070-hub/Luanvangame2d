@@ -32,9 +32,6 @@ public class GameManager : MonoBehaviour
     Vector3 lastCheckpoint;
     bool hasCheckpoint = false;
 
-    [Header("Audio")]
-    public AudioSource music;
-
     // 👉 CHỐNG SAVE LẶP
     bool isSaved = false;
 
@@ -57,7 +54,6 @@ public class GameManager : MonoBehaviour
         if (player != null)
             lastCheckpoint = player.position;
 
-        // 👉 LOAD MODE
         difficulty = PlayerPrefs.GetInt("difficulty", 0);
 
         isSaved = false;
@@ -74,14 +70,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // AUDIO
-    public void SetVolume(float volume)
-    {
-        if (music != null)
-            music.volume = volume;
-    }
-
-    // CHECKPOINT
+    // ================= CHECKPOINT =================
     public void SetCheckpoint(Vector3 pos)
     {
         lastCheckpoint = pos;
@@ -90,7 +79,20 @@ public class GameManager : MonoBehaviour
         Debug.Log("Checkpoint Saved: " + pos);
     }
 
-    // DAMAGE
+    public void LoadLastCheckpoint()
+    {
+        if (hasCheckpoint)
+        {
+            RespawnPlayer();
+            Debug.Log("Loaded Checkpoint");
+        }
+        else
+        {
+            Debug.Log("No checkpoint!");
+        }
+    }
+
+    // ================= DAMAGE =================
     public void TakeDamage()
     {
         currentHearts--;
@@ -134,7 +136,7 @@ public class GameManager : MonoBehaviour
         currentHearts = maxHearts;
     }
 
-    // SCORE
+    // ================= SCORE =================
     public void AddScore(int amount)
     {
         score += amount;
@@ -147,7 +149,7 @@ public class GameManager : MonoBehaviour
             scoreText.text = "Score: " + score;
     }
 
-    // PAUSE
+    // ================= PAUSE =================
     public void PauseGame()
     {
         if (pausePanel != null)
@@ -166,10 +168,9 @@ public class GameManager : MonoBehaviour
         isPaused = false;
     }
 
-    // GAME OVER (🔥 AUTO SAVE Ở ĐÂY)
+    // ================= GAME OVER =================
     public void GameOver()
     {
-        // 👉 chỉ save 1 lần
         if (!isSaved)
         {
             if (AchievementManager.instance != null)
@@ -194,14 +195,14 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0f;
     }
 
-    // RESTART
+    // ================= RESTART =================
     public void RestartGame()
     {
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    // MAIN MENU
+    // ================= MAIN MENU =================
     public void GoToMainMenu()
     {
         Time.timeScale = 1f;
