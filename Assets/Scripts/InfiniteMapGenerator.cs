@@ -101,7 +101,7 @@ public class InfiniteMapGenerator : MonoBehaviour
             trapChance = 25;
             enemyChance = 30;
             islandChance = 20;
-            coinChance = 60;
+            coinChance = 30;
         }
         else
         {
@@ -111,7 +111,7 @@ public class InfiniteMapGenerator : MonoBehaviour
             trapChance = 65;
             enemyChance = 55;
             islandChance = 40;
-            coinChance = 40;
+            coinChance = 20;
         }
     }
 
@@ -268,7 +268,7 @@ public class InfiniteMapGenerator : MonoBehaviour
         Collider2D col = tile.GetComponent<Collider2D>();
 
         float centerX = col.bounds.center.x;
-        float baseY = topY + 2.8f;
+        float baseY = topY + 3.8f;
 
         int pattern = Random.Range(0, 4);
 
@@ -387,12 +387,12 @@ public class InfiniteMapGenerator : MonoBehaviour
 
         float spawnX = bgLastX + backgroundWidth;
 
-        GameObject mainBG = Instantiate(bg, new Vector3(spawnX, 0, 10), Quaternion.identity);
+        GameObject main = Instantiate(bg, new Vector3(spawnX, 0, 10), Quaternion.identity);
 
-        float height = mainBG.GetComponent<SpriteRenderer>().bounds.size.y;
+        float h = main.GetComponent<SpriteRenderer>().bounds.size.y;
 
-        Instantiate(bg, new Vector3(spawnX, height, 10), Quaternion.identity);
-        Instantiate(bg, new Vector3(spawnX, -height, 10), Quaternion.identity);
+        Instantiate(bg, new Vector3(spawnX, h, 10), Quaternion.identity);
+        Instantiate(bg, new Vector3(spawnX, -h, 10), Quaternion.identity);
 
         bgLastX = spawnX;
     }
@@ -414,7 +414,7 @@ public class InfiniteMapGenerator : MonoBehaviour
         if (leftBlockPrefab == null) return;
 
         Vector3 spawnPos = new Vector3(
-            player.position.x - 3.5f,
+            player.position.x - 6f, // 🔥 đẩy xa hơn (trước là -3.5f)
             player.position.y - 2f,
             0
         );
