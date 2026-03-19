@@ -8,8 +8,8 @@ public class LoadingManager : MonoBehaviour
 {
     public static string SceneToLoad;
     public Slider loadingBar;
-    public TextMeshProUGUI percentText; // Kéo Text % vào đây
-    public TextMeshProUGUI tipText;     // Kéo Text Mẹo vào đây
+    public TextMeshProUGUI percentText; 
+    public TextMeshProUGUI tipText;    
 
     // Danh sách các câu mẹo
     public string[] tips = {

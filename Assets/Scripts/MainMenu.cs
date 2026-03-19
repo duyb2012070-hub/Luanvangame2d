@@ -53,7 +53,15 @@ public class MainMenu : MonoBehaviour
         if (achievementPanel) achievementPanel.SetActive(false);
     }
 
-    public void ShowMainMenu() { HideAllPanels(); mainMenuPanel.SetActive(true); }
+    public void ShowMainMenu()
+    {
+        HideAllPanels();
+        mainMenuPanel.SetActive(true);
+
+        // ✅ Bật lại nút Achievement
+        if (achievementButtonsPanel != null)
+            achievementButtonsPanel.SetActive(true);
+    }
     public void OpenPlayMenu() { HideAllPanels(); playMenuPanel.SetActive(true); }
     public void OpenDifficulty() { HideAllPanels(); difficultyPanel.SetActive(true); }
     public void OpenSettings() { HideAllPanels(); settingsPanel.SetActive(true); }
