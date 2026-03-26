@@ -4458,9 +4458,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AchievementUI
   content: {fileID: 2063736518}
   itemPrefab: {fileID: 3192687028303773889, guid: 53ebb00273b6ec741bd95112b81bda05, type: 3}
-  easyButton: {fileID: 2011509162}
-  normalButton: {fileID: 1110666776}
-  hardButton: {fileID: 1301528952}
+  easyButton: {fileID: 2011509164}
+  normalButton: {fileID: 1110666778}
+  hardButton: {fileID: 1301528954}
 --- !u!1 &966602616
 GameObject:
   m_ObjectHideFlags: 0
@@ -11410,7 +11410,6 @@ GameObject:
   - component: {fileID: 2063736518}
   - component: {fileID: 2063736520}
   - component: {fileID: 2063736519}
-  - component: {fileID: 2063736521}
   m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
@@ -11477,23 +11476,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!114 &2063736521
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2063736517}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 302d68518a14a5745b9393d371a0f7da, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AchievementUI
-  content: {fileID: 0}
-  itemPrefab: {fileID: 0}
-  easyButton: {fileID: 0}
-  normalButton: {fileID: 0}
-  hardButton: {fileID: 0}
 --- !u!1 &2072568576
 GameObject:
   m_ObjectHideFlags: 0

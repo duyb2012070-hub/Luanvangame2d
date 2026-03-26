@@ -81,9 +81,9 @@ public class InfiniteMapGenerator : MonoBehaviour
 
     void ApplyDifficulty()
     {
-        int d = DifficultyManager.difficulty;
+        int d = PlayerPrefs.GetInt("difficulty", 0);
 
-        if (d == 0)
+        if (d == 0) // Easy
         {
             minGap = 2.5f;
             maxGap = 4f;
@@ -93,7 +93,7 @@ public class InfiniteMapGenerator : MonoBehaviour
             islandChance = 10;
             coinChance = 85;
         }
-        else if (d == 1)
+        else if (d == 1) // Normal
         {
             minGap = 3.5f;
             maxGap = 5.5f;
@@ -103,7 +103,7 @@ public class InfiniteMapGenerator : MonoBehaviour
             islandChance = 20;
             coinChance = 30;
         }
-        else
+        else // Hard
         {
             minGap = 4.5f;
             maxGap = 6f;
@@ -113,6 +113,8 @@ public class InfiniteMapGenerator : MonoBehaviour
             islandChance = 40;
             coinChance = 20;
         }
+
+        Debug.Log("Map Generator đã nhận độ khó: " + d);
     }
 
     public void StartMap()

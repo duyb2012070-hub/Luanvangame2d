@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using SQLite;
 
 public class AchievementManager : MonoBehaviour
 {
@@ -22,129 +22,103 @@ public class AchievementManager : MonoBehaviour
         }
     }
 
-    // =========================
-    // 💾 SAVE ACHIEVEMENT
-    // =========================
-    public void SaveAchievement()
+    // =====================================================
+    // 💾 SAVE GAME END (QUY TRÌNH CHUẨN)
+    // =====================================================
+    public void SaveGameEnd()
     {
-        Debug.Log(" CALL SAVE | isSaved = " + isSaved);
+        Debug.Log($"[Database] Bắt đầu quy trình lưu... Trạng thái hiện tại: isSaved = {isSaved}");
 
-        // ❗ tránh save nhiều lần
-        if (isSaved)
+        if (isSaved) return;
+
+        // 1. Kiểm tra các thành phần bắt buộc
+        if (GameManager.instance == null || DatabaseManager.db == null)
         {
-            Debug.Log(" Đã save rồi, bỏ qua!");
+            Debug.LogError("❌ Không thể save: GameManager hoặc DatabaseManager NULL!");
             return;
         }
-
-        // ❗ check dependency
-        if (GameManager.instance == null)
-        {
-            Debug.LogError(" GameManager NULL!");
-            return;
-        }
-
-        if (DatabaseManager.db == null)
-        {
-            Debug.LogError(" Database NULL!");
-            return;
-        }
-
-        AchievementData data = new AchievementData();
 
         try
         {
-            // 👤 NAME
-            data.playerName = PlayerPrefs.GetString("playerName", "Player");
+            // 🔥 Lấy độ khó thực tế từ PlayerPrefs (0: Easy, 1: Normal, 2: Hard)
+            int actualDifficulty = PlayerPrefs.GetInt("difficulty", 0);
+            string pName = PlayerPrefs.GetString("playerName", "Player");
 
-            // 💰 COIN
-            data.coin = GameManager.instance.score;
-
-            // 📏 DISTANCE
-            if (GameManager.instance.player != null)
+            // BƯỚC A: TẠO VÀ LƯU SESSION
+            GameSessionData currentSession = new GameSessionData
             {
-                data.distance = GameManager.instance.player.position.x;
-            }
-            else
+                playerName = pName,
+                difficultyID = actualDifficulty,
+                score = GameManager.instance.score,
+
+                // ✅ SỬA LỖI: Chuyển float thành string bằng ToString()
+                // "F1" giúp lấy 1 chữ số thập phân (Ví dụ: "125.5s")
+                time = Time.timeSinceLevelLoad.ToString("F1") + "s",
+
+                distance = (GameManager.instance.player != null) ? GameManager.instance.player.position.x : 0,
+                currentHP = GameManager.instance.currentHearts
+            };
+
+            // Chèn vào DB để lấy ID tự động tăng
+            DatabaseManager.db.Insert(currentSession);
+            int generatedSessionID = currentSession.sessionID;
+
+            Debug.Log($"[Database] Đã tạo Session ID: {generatedSessionID} cho chế độ: {actualDifficulty}");
+
+            // BƯỚC B: TẠO VÀ LƯU ACHIEVEMENT LIÊN KẾT
+            AchievementData achievement = new AchievementData
             {
-                Debug.LogWarning("⚠️ Player NULL → distance = 0");
-                data.distance = 0;
-            }
+                sessionID = generatedSessionID,
+                coin = currentSession.score,
+                distance = currentSession.distance,
+                hp = currentSession.currentHP,
 
-            // ❤️ HP
-            data.hp = Mathf.Max(1, GameManager.instance.currentHearts);
+                // ✅ Lưu thời điểm thực tế đạt được kỷ lục
+                time = DateTime.Now.ToString("HH:mm:ss")
+            };
 
-            // 🎮 MODE
-            data.difficulty = GameManager.instance.difficulty;
-
-            // 🕒 TIME
-            data.time = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-
-            // 💾 INSERT DB
-            int result = DatabaseManager.db.Insert(data);
+            int result = DatabaseManager.db.Insert(achievement);
 
             if (result > 0)
             {
-                Debug.Log($" SAVED SUCCESS | Coin: {data.coin} | Distance: {data.distance}");
+                Debug.Log($"✅ [Database] Lưu thành công! Mode: {actualDifficulty} | Player: {pName}");
                 isSaved = true;
-            }
-            else
-            {
-                Debug.LogError("❌ Insert thất bại!");
             }
         }
         catch (Exception e)
         {
-            Debug.LogError("❌ SAVE ERROR: " + e.Message);
+            Debug.LogError("❌ [Database] Lỗi nghiêm trọng khi lưu: " + e.Message);
         }
     }
 
-    // =========================
-    // 🏆 TOP 1 COIN
-    // =========================
-    public AchievementData GetBestByCoin()
+    // =====================================================
+    // 🏆 TRUY VẤN TOP SCORE THEO CHẾ ĐỘ (DÙNG CHO UI)
+    // =====================================================
+    public List<AchievementDisplayModel> GetTopScoresByMode(int mode, int limit = 10)
     {
-        if (DatabaseManager.db == null)
-        {
-            Debug.LogError("❌ Database null!");
-            return null;
-        }
+        if (DatabaseManager.db == null) return new List<AchievementDisplayModel>();
 
-        return DatabaseManager.db
-            .Table<AchievementData>()
-            .OrderByDescending(x => x.coin)
-            .FirstOrDefault();
+        // JOIN bảng để lấy Tên từ Session và Điểm từ Achievement
+        string sql = @"
+            SELECT s.playerName, a.coin, a.distance, a.time 
+            FROM AchievementData a
+            JOIN GameSessionData s ON a.sessionID = s.sessionID
+            WHERE s.difficultyID = ?
+            ORDER BY a.coin DESC 
+            LIMIT ?";
+
+        return DatabaseManager.db.Query<AchievementDisplayModel>(sql, mode, limit);
     }
 
     // =========================
-    // 🏆 TOP N COIN
-    // =========================
-    public List<AchievementData> GetTopByCoin(int limit = 5)
-    {
-        if (DatabaseManager.db == null)
-        {
-            Debug.LogError("❌ Database null!");
-            return new List<AchievementData>();
-        }
-
-        return DatabaseManager.db
-            .Table<AchievementData>()
-            .OrderByDescending(x => x.coin)
-            .Take(limit)
-            .ToList();
-    }
-
-    // =========================
-    // 🔄 RESET SAVE
+    // 🔄 HỆ THỐNG QUẢN LÝ FLAG
     // =========================
     public void ResetSave()
     {
-        Debug.Log("🔄 Reset Save Flag");
         isSaved = false;
+        Debug.Log("[Database] Reset Save Flag cho lượt chơi mới.");
     }
 
-    // =========================
-    // 🚀 AUTO RESET KHI LOAD SCENE
-    // =========================
     void OnEnable()
     {
         UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
@@ -159,4 +133,13 @@ public class AchievementManager : MonoBehaviour
     {
         ResetSave();
     }
+}
+
+// Lớp model để hứng dữ liệu hiển thị UI
+public class AchievementDisplayModel
+{
+    public string playerName { get; set; }
+    public int coin { get; set; }
+    public float distance { get; set; }
+    public string time { get; set; }
 }

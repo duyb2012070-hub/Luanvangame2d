@@ -15,87 +15,77 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI finalScoreText;
 
     [Header("Game Settings")]
-    public int mapSeed;
     public int difficulty;
 
     [Header("UI Panels")]
     public GameObject pausePanel;
     public GameObject gameOverPanel;
 
-    bool isPaused;
+    private bool isPaused;
+    private bool isGameOver = false;
 
-    [Header("Player Hearts")]
+    [Header("Player Stats (Hearts)")]
     public int maxHearts = 3;
     public int currentHearts;
 
-    [Header("Checkpoint")]
-    Vector3 lastCheckpoint;
-    bool hasCheckpoint = false;
+    [Header("Lives System (Respawns)")]
+    public int totalLives = 3;
+    public TextMeshProUGUI livesText; // Kéo Text hiển thị số mạng vào đây
 
-    // 👉 chống gọi GameOver nhiều lần
-    bool isGameOver = false;
+    [Header("Checkpoint")]
+    private Vector3 lastCheckpoint;
+    private bool hasCheckpoint = false;
 
     void Awake()
     {
+        // Reset thời gian về bình thường mỗi khi load scene
         Time.timeScale = 1f;
 
         if (instance == null)
+        {
             instance = this;
+        }
         else
+        {
             Destroy(gameObject);
+        }
     }
 
     void Start()
     {
-        UpdateScore();
-
+        isGameOver = false;
         currentHearts = maxHearts;
+
+        // Lấy độ khó từ Menu gửi qua
+        difficulty = PlayerPrefs.GetInt("difficulty", 0);
 
         if (player != null)
             lastCheckpoint = player.position;
 
-        difficulty = PlayerPrefs.GetInt("difficulty", 0);
-
-        isGameOver = false;
+        UpdateScoreUI();
+        UpdateLivesUI();
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        // Phím tắt Pause game
+        if (Input.GetKeyDown(KeyCode.Escape) && !isGameOver)
         {
-            if (isPaused)
-                ResumeGame();
-            else
-                PauseGame();
+            if (isPaused) ResumeGame();
+            else PauseGame();
         }
     }
 
-    // ================= CHECKPOINT =================
-    public void SetCheckpoint(Vector3 pos)
-    {
-        lastCheckpoint = pos;
-        hasCheckpoint = true;
+    // =====================================================
+    // ❤️ HỆ THỐNG SINH TỒN & HỒI MÁU (FIX LỖI CS1061)
+    // =====================================================
 
-        Debug.Log("Checkpoint Saved: " + pos);
-    }
-
-    public void LoadLastCheckpoint()
-    {
-        if (hasCheckpoint)
-        {
-            RespawnPlayer();
-            Debug.Log("Loaded Checkpoint");
-        }
-        else
-        {
-            Debug.Log("No checkpoint!");
-        }
-    }
-
-    // ================= DAMAGE =================
     public void TakeDamage()
     {
+        if (isGameOver) return;
+
         currentHearts--;
+        Debug.Log($"[GameManager] Player mất máu! Còn lại: {currentHearts}");
 
         if (currentHearts <= 0)
         {
@@ -103,27 +93,49 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Hàm hồi máu cho các vật phẩm HeartCollect gọi tới
     public void AddHealth(int amount)
     {
-        currentHearts += amount;
+        currentHearts = Mathf.Min(currentHearts + amount, maxHearts);
+        Debug.Log($"[GameManager] Đã hồi {amount} máu. Hiện tại: {currentHearts}");
+    }
 
-        if (currentHearts > maxHearts)
-            currentHearts = maxHearts;
+    // Hàm hồi mạng (Nếu sau này bạn làm vật phẩm tăng Mạng)
+    public void AddLife(int amount)
+    {
+        totalLives += amount;
+        UpdateLivesUI();
+    }
+
+    // =====================================================
+    // 🚩 HỆ THỐNG CHECKPOINT & HỒI SINH
+    // =====================================================
+
+    public void SetCheckpoint(Vector3 pos)
+    {
+        lastCheckpoint = pos;
+        hasCheckpoint = true;
+        Debug.Log($"[GameManager] Đã lưu Checkpoint mới tại: {pos}");
     }
 
     public void PlayerFall()
     {
+        if (isGameOver) return;
         RespawnOrGameOver();
     }
 
-    void RespawnOrGameOver()
+    private void RespawnOrGameOver()
     {
-        if (hasCheckpoint)
+        // Nếu còn mạng (Lives) và có Checkpoint -> Cho hồi sinh
+        if (hasCheckpoint && totalLives > 0)
         {
+            totalLives--; // Trừ 1 mạng
+            UpdateLivesUI();
             RespawnPlayer();
         }
         else
         {
+            // Hết mạng hoặc chưa chạm checkpoint nào -> Chết thực sự
             GameOver();
         }
     }
@@ -132,100 +144,91 @@ public class GameManager : MonoBehaviour
     {
         if (player == null) return;
 
+        // Đưa player về checkpoint và hồi lại đầy Tim cho mạng mới
         player.position = lastCheckpoint + new Vector3(0, 2f, 0);
         currentHearts = maxHearts;
+        Debug.Log($"[GameManager] Đã hồi sinh Player. Mạng còn lại: {totalLives}");
     }
 
-    // ================= SCORE =================
+    private void UpdateLivesUI()
+    {
+        if (livesText != null)
+            livesText.text = "Lives: " + totalLives;
+    }
+
+    // =====================================================
+    // 💰 HỆ THỐNG ĐIỂM SỐ
+    // =====================================================
+
     public void AddScore(int amount)
     {
         score += amount;
-        UpdateScore();
+        UpdateScoreUI();
     }
 
-    void UpdateScore()
+    private void UpdateScoreUI()
     {
         if (scoreText != null)
             scoreText.text = "Score: " + score;
     }
 
-    // ================= PAUSE =================
+    // =====================================================
+    // ⏸️ ĐIỀU KHIỂN & LƯU DATABASE
+    // =====================================================
+
     public void PauseGame()
     {
-        if (pausePanel != null)
-            pausePanel.SetActive(true);
-
-        Time.timeScale = 0f;
         isPaused = true;
+        Time.timeScale = 0f;
+        if (pausePanel != null) pausePanel.SetActive(true);
     }
 
     public void ResumeGame()
     {
-        if (pausePanel != null)
-            pausePanel.SetActive(false);
-
-        Time.timeScale = 1f;
         isPaused = false;
+        Time.timeScale = 1f;
+        if (pausePanel != null) pausePanel.SetActive(false);
     }
 
-    // ================= GAME OVER =================
     public void GameOver()
     {
-        // ❗ tránh gọi nhiều lần
         if (isGameOver) return;
         isGameOver = true;
 
-        // 💾 SAVE ACHIEVEMENT
+        Debug.Log("[GameManager] GAME OVER! Đang thực hiện lưu dữ liệu...");
+
+        // GỌI LƯU DATABASE NGAY KHI THUA
         if (AchievementManager.instance != null)
         {
-            AchievementManager.instance.SaveAchievement();
-            Debug.Log("✅ AUTO SAVED ACHIEVEMENT");
+            AchievementManager.instance.SaveGameEnd();
         }
-        else
-        {
-            Debug.LogWarning("❌ Không tìm thấy AchievementManager!");
-        }
-
-        // UI
-        if (gameOverPanel != null)
-            gameOverPanel.SetActive(true);
-
-        if (finalScoreText != null)
-            finalScoreText.text = "Final Score: " + score;
 
         Time.timeScale = 0f;
+        if (gameOverPanel != null) gameOverPanel.SetActive(true);
+        if (finalScoreText != null) finalScoreText.text = "Final Score: " + score;
     }
 
-    // ================= RESTART =================
     public void RestartGame()
     {
         Time.timeScale = 1f;
-
+        // Reset cờ đã lưu để lượt chơi mới có thể lưu tiếp
         if (AchievementManager.instance != null)
-            AchievementManager.instance.ResetSave(); // reset cho lượt mới
+            AchievementManager.instance.ResetSave();
 
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
-    public void GoToScene(string targetSceneName)
-    {
-        // 1. Ghi nhớ cảnh muốn đến vào biến tĩnh của LoadingManager
-        LoadingManager.SceneToLoad = targetSceneName;
 
-        // 2. Mở Scene Loading lên trước
-        SceneManager.LoadScene("LoadingScene");
-    }
-    // ================= MAIN MENU =================
     public void GoToMainMenu()
     {
-        // 1. Đảm bảo thời gian trở lại bình thường (nếu game đang Pause)
         Time.timeScale = 1f;
 
-        // 2. Gán tên Scene muốn đến vào biến tĩnh của LoadingManager
-        // Lưu ý: Tên "Main Menu" phải khớp 100% với tên trong Build Settings
-        LoadingManager.SceneToLoad = "Main Menu";
+        // TỰ ĐỘNG LƯU: Nếu người chơi chủ động thoát ngang từ Menu Pause
+        if (!isGameOver && AchievementManager.instance != null)
+        {
+            AchievementManager.instance.SaveGameEnd();
+        }
 
-        // 3. Load màn hình Loading trước
-        // Lưu ý: Tên "LoadingSence" phải khớp với tên bạn đặt (có chữ e ở giữa)
+        LoadingManager.SceneToLoad = "Main Menu";
         SceneManager.LoadScene("LoadingSence");
     }
 }

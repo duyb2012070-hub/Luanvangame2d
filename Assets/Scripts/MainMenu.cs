@@ -16,8 +16,8 @@ public class MainMenu : MonoBehaviour
     public TMP_InputField nameInput;
 
     [Header("Scene Names")]
-    public string gameSceneName = "game"; // Đổi thành "game" cho khớp với ảnh Build của bạn
-    public string loadingSceneName = "LoadingSence"; // Khớp chính xác tên bạn đặt
+    public string gameSceneName = "game";
+    public string loadingSceneName = "LoadingSence";
 
     [Header("Achievement UI")]
     public AchievementUI achievementUI;
@@ -28,14 +28,16 @@ public class MainMenu : MonoBehaviour
     void Start()
     {
         ShowMainMenu();
+
+        // Mẹo: Khi bắt đầu Menu, bạn có thể xóa các PlayerPrefs cũ 
+        // để đảm bảo không còn dữ liệu "rác" từ hệ thống Continue cũ.
+        // PlayerPrefs.DeleteKey("lastPosition"); 
     }
 
     // --- HỆ THỐNG LOAD SCENE TRUNG GIAN ---
-    // Hàm này sẽ được gọi thay vì SceneManager.LoadScene trực tiếp
     public void LoadWithLoadingScreen(string targetSceneName)
     {
-        // 1. Ghi nhớ cảnh muốn đến vào biến tĩnh của LoadingManager
-        // Lưu ý: Đảm bảo bạn đã tạo biến 'public static string SceneToLoad' trong script LoadingManager
+        // 1. Ghi nhớ cảnh muốn đến
         LoadingManager.SceneToLoad = targetSceneName;
 
         // 2. Mở Scene Loading
@@ -58,10 +60,10 @@ public class MainMenu : MonoBehaviour
         HideAllPanels();
         mainMenuPanel.SetActive(true);
 
-        // ✅ Bật lại nút Achievement
         if (achievementButtonsPanel != null)
             achievementButtonsPanel.SetActive(true);
     }
+
     public void OpenPlayMenu() { HideAllPanels(); playMenuPanel.SetActive(true); }
     public void OpenDifficulty() { HideAllPanels(); difficultyPanel.SetActive(true); }
     public void OpenSettings() { HideAllPanels(); settingsPanel.SetActive(true); }
@@ -104,9 +106,9 @@ public class MainMenu : MonoBehaviour
 #endif
     }
 
-    // ========================
-    // NEW GAME (HỖ TRỢ LOADING SCREEN)
-    // ========================
+    // =====================================================
+    // 🎮 NEW GAME (CHỈ CÒN CHẾ ĐỘ CHƠI MỚI)
+    // =====================================================
 
     public void StartEasy() { StartNewGame(0); }
     public void StartNormal() { StartNewGame(1); }
@@ -114,36 +116,29 @@ public class MainMenu : MonoBehaviour
 
     void StartNewGame(int difficulty)
     {
-        // Lưu thông số độ khó
+        // 1. Lưu thông số độ khó mới
         PlayerPrefs.SetInt("difficulty", difficulty);
 
-        // Lưu tên người chơi
+        // 2. Lưu tên người chơi mới
         if (nameInput != null && !string.IsNullOrEmpty(nameInput.text))
             PlayerPrefs.SetString("playerName", nameInput.text);
         else
             PlayerPrefs.SetString("playerName", "Player");
 
+        // 3. Xóa các dữ liệu checkpoint cũ nếu có để tránh New Game mà bị nhảy checkpoint
+        // PlayerPrefs.DeleteKey("checkpointX"); 
+
         PlayerPrefs.Save();
 
-        Debug.Log("Start NEW Game Difficulty: " + difficulty);
+        Debug.Log($"[MainMenu] Bắt đầu chơi mới - Độ khó: {difficulty}");
 
-        // Gọi màn hình Loading thay vì vào thẳng game
+        // 4. Vào game qua màn hình Loading
         LoadWithLoadingScreen(gameSceneName);
     }
 
-    // ========================
-    // CONTINUE & UTILS
-    // ========================
-
-    public void ContinueGame()
-    {
-        Debug.Log("Continue Game");
-        LoadWithLoadingScreen(gameSceneName);
-    }
-
-    // Hàm này dùng cho nút "Back to Main Menu" từ trong Game Scene
+    // --- TIỆN ÍCH ---
     public void GoToMainMenu()
     {
-        LoadWithLoadingScreen("Main Menu"); // Khớp với tên Scene Menu trong Build Settings
+        LoadWithLoadingScreen("Main Menu");
     }
 }
