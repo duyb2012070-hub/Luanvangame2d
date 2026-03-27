@@ -130,6 +130,7 @@ GameObject:
   - component: {fileID: 42917571}
   - component: {fileID: 42917570}
   - component: {fileID: 42917569}
+  - component: {fileID: 42917572}
   m_Layer: 0
   m_Name: GameMusic
   m_TagString: Untagged
@@ -268,6 +269,14 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!81 &42917572
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 42917568}
+  m_Enabled: 1
 --- !u!1 &43456737
 GameObject:
   m_ObjectHideFlags: 0
@@ -679,15 +688,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   player: {fileID: 1612656639}
-  score: 0
   scoreText: {fileID: 1461946152}
   finalScoreText: {fileID: 942283158}
-  mapSeed: 0
-  difficulty: 0
+  heartsText: {fileID: 0}
   pausePanel: {fileID: 1113352775}
   gameOverPanel: {fileID: 1088719077}
+  score: 0
+  difficulty: 0
   maxHearts: 3
   currentHearts: 0
+  defaultMusicVolume: 0.5
 --- !u!4 &230375691
 Transform:
   m_ObjectHideFlags: 0
@@ -1599,7 +1609,6 @@ GameObject:
   m_Component:
   - component: {fileID: 519420032}
   - component: {fileID: 519420031}
-  - component: {fileID: 519420029}
   - component: {fileID: 519420030}
   - component: {fileID: 519420033}
   m_Layer: 0
@@ -1609,14 +1618,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &519420029
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 519420028}
-  m_Enabled: 1
 --- !u!114 &519420030
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2032,6 +2033,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InfiniteMapGenerator
   player: {fileID: 1612656639}
+  leftBlockPrefab: {fileID: 7216788290254518636, guid: 1acff8d120df27349ba489610db42d8d, type: 3}
   groundPrefabs:
   - {fileID: 4982367816019683477, guid: e35db06d9e7287e40b56c034211d6807, type: 3}
   - {fileID: 4515653403503376071, guid: be2188c9b1f06c148a239aafc8e2ca9e, type: 3}
@@ -2063,7 +2065,6 @@ MonoBehaviour:
   backgroundPrefabs:
   - {fileID: 1360991469485481007, guid: 0c7c043d904c0a3408e674a5facbb742, type: 3}
   backgroundWidth: 30
-  leftBlockPrefab: {fileID: 7216788290254518636, guid: 1acff8d120df27349ba489610db42d8d, type: 3}
   startTiles: 12
   spawnDistance: 15
 --- !u!4 &908508101
@@ -2441,7 +2442,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 230375690}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: LoadLastCheckpoint
+        m_MethodName: LoadToLastCheckpoint
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3007,9 +3008,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: SaveGameManager, Assembly-CSharp
-        m_MethodName: SaveGame
+      - m_Target: {fileID: 230375690}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: SaveGameToDatabase
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
