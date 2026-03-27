@@ -1,19 +1,18 @@
 ﻿using UnityEngine;
 using SQLite;
+using System.IO;
 
 public class DatabaseManager : MonoBehaviour
 {
-    // Singleton instance để các script khác truy cập dễ dàng
     public static DatabaseManager instance;
     public static SQLiteConnection db;
 
     void Awake()
     {
-        // Kiểm tra nếu đã có instance rồi thì xóa cái mới đi, giữ cái cũ (Singleton)
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject); // Giữ Database sống xuyên suốt các Scene
+            DontDestroyOnLoad(gameObject);
             InitializeDatabase();
         }
         else
@@ -26,10 +25,13 @@ public class DatabaseManager : MonoBehaviour
     {
         try
         {
-            string path = Application.persistentDataPath + "/game.db";
+            // Sử dụng Path.Combine để tránh lỗi gạch chéo ngược/xuôi trên các hệ điều hành khác nhau
+            string path = Path.Combine(Application.persistentDataPath, "game.db");
+
+            // Mở kết nối
             db = new SQLiteConnection(path);
 
-            // Tạo các bảng
+            // Tạo các bảng nếu chưa tồn tại (Nếu bảng đã có, SQLite sẽ tự bỏ qua, không mất dữ liệu cũ)
             db.CreateTable<PlayerData>();
             db.CreateTable<GameSessionData>();
             db.CreateTable<AchievementData>();
@@ -37,7 +39,7 @@ public class DatabaseManager : MonoBehaviour
             db.CreateTable<CheckpointData>();
             db.CreateTable<SaveGameData>();
 
-            Debug.Log("✅ Database initialized successfully at: " + path);
+            Debug.Log($"<color=green>✅ Database initialized successfully at:</color> {path}");
         }
         catch (System.Exception e)
         {
@@ -45,7 +47,17 @@ public class DatabaseManager : MonoBehaviour
         }
     }
 
-    // Đóng kết nối khi thoát game để tránh lỗi file busy
+    // Hàm tiện ích: Xóa toàn bộ Save để test mới hoàn toàn (Dùng khi cần)
+    public void ResetAllData()
+    {
+        if (db != null)
+        {
+            db.DeleteAll<SaveGameData>();
+            db.DeleteAll<AchievementData>();
+            Debug.Log("⚠️ All database tables cleared.");
+        }
+    }
+
     private void OnApplicationQuit()
     {
         if (db != null)
@@ -56,12 +68,15 @@ public class DatabaseManager : MonoBehaviour
     }
 }
 
-// Giữ nguyên định nghĩa Class dữ liệu của bạn
+// Model SaveGameData chuẩn hóa để khớp với GameManager của bạn
 public class SaveGameData
 {
     [PrimaryKey, AutoIncrement]
     public int id { get; set; }
+
+    [Indexed] // Index giúp tìm kiếm tên người chơi nhanh hơn khi Load
     public string playerName { get; set; }
+
     public int difficultyID { get; set; }
     public int score { get; set; }
     public int health { get; set; }
