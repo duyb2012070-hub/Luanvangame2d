@@ -12,7 +12,8 @@ public class MainMenu : MonoBehaviour
     public GameObject settingsPanel;
     public GameObject guidePanel;
     public GameObject achievementPanel;
-    public GameObject noSaveWarningPanel; // <--- Panel thông báo sẽ hiện ở đây
+    public GameObject noSaveWarningPanel;
+    public GameObject storyPanel; // <--- Thêm Panel Story ở đây
 
     [Header("--- Achievement Sub-Panels ---")]
     public GameObject achievementButtonsPanel;
@@ -41,17 +42,31 @@ public class MainMenu : MonoBehaviour
         ApplyAudioSettings();
         ShowMainMenu();
 
-        // Luôn ẩn panel cảnh báo khi mới vào game
         if (noSaveWarningPanel != null) noSaveWarningPanel.SetActive(false);
+        // Ẩn story panel khi bắt đầu
+        if (storyPanel != null) storyPanel.SetActive(false);
+    }
+
+    // --- LOGIC MỞ VÀ ĐÓNG STORY PANEL ---
+    public void OpenStory()
+    {
+        HideAllPanels();
+        if (storyPanel != null)
+        {
+            storyPanel.SetActive(true);
+        }
+    }
+
+    public void BackFromStory()
+    {
+        ShowMainMenu(); // Quay lại menu chính
     }
 
     // --- LOGIC TIẾP TỤC GAME (CONTINUE) ---
     public void ContinueGame()
     {
-        // Lấy tên người chơi, nếu trống thì mặc định là "Player"
         string pName = (nameInput != null && !string.IsNullOrEmpty(nameInput.text)) ? nameInput.text : "Player";
 
-        // Kiểm tra trong AchievementManager (hoặc Database) xem có dữ liệu của pName này không
         if (AchievementManager.instance != null && AchievementManager.instance.CheckHasSaveData(pName))
         {
             Debug.Log($"<color=green>📂 Tìm thấy dữ liệu cho: {pName}. Đang tải game...</color>");
@@ -62,26 +77,18 @@ public class MainMenu : MonoBehaviour
         }
         else
         {
-            // NẾU KHÔNG CÓ DỮ LIỆU -> Hiện bảng thông báo
             Debug.LogWarning($"⚠️ Không tìm thấy dữ liệu lưu cho: {pName}");
             if (noSaveWarningPanel != null)
             {
                 noSaveWarningPanel.SetActive(true);
             }
-            else
-            {
-                Debug.LogError("❌ Bạn chưa kéo thả 'NoSaveWarningPanel' vào script MainMenu trong Inspector!");
-            }
         }
     }
 
-    // Hàm để gán vào nút "Đóng" hoặc "OK" trên Panel cảnh báo
     public void CloseNoSaveWarning()
     {
         if (noSaveWarningPanel != null) noSaveWarningPanel.SetActive(false);
     }
-
-    // --- CÁC HÀM QUẢN LÝ PANEL KHÁC (GIỮ NGUYÊN) ---
 
     private void HideAllPanels()
     {
@@ -92,6 +99,7 @@ public class MainMenu : MonoBehaviour
         if (guidePanel) guidePanel.SetActive(false);
         if (achievementPanel) achievementPanel.SetActive(false);
         if (noSaveWarningPanel) noSaveWarningPanel.SetActive(false);
+        if (storyPanel) storyPanel.SetActive(false); // Ẩn luôn story panel
     }
 
     public void ShowMainMenu()
@@ -101,6 +109,7 @@ public class MainMenu : MonoBehaviour
         if (achievementButtonsPanel) achievementButtonsPanel.SetActive(true);
     }
 
+    // --- CÁC HÀM CŨ GIỮ NGUYÊN ---
     public void OpenAchievement()
     {
         HideAllPanels();
