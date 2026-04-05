@@ -1068,6 +1068,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHover
   scaleMultiplier: 1.1
   speed: 10
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!1 &233216089
 GameObject:
   m_ObjectHideFlags: 0
@@ -2141,6 +2144,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHover
   scaleMultiplier: 1.1
   speed: 10
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!1 &422650997
 GameObject:
   m_ObjectHideFlags: 0
@@ -2289,6 +2295,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHover
   scaleMultiplier: 1.1
   speed: 10
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!1 &427155743
 GameObject:
   m_ObjectHideFlags: 0
@@ -2512,6 +2521,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHover
   scaleMultiplier: 1.1
   speed: 10
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!1 &491575111
 GameObject:
   m_ObjectHideFlags: 0
@@ -2660,6 +2672,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHover
   scaleMultiplier: 1.1
   speed: 10
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!1 &543257004
 GameObject:
   m_ObjectHideFlags: 0
@@ -3152,6 +3167,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHover
   scaleMultiplier: 1.1
   speed: 10
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!1 &610777685
 GameObject:
   m_ObjectHideFlags: 0
@@ -4702,6 +4720,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHover
   scaleMultiplier: 1.1
   speed: 10
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 0}
+  volume: 0.5
 --- !u!114 &929762389
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4716,6 +4737,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHover
   scaleMultiplier: 1.1
   speed: 10
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!1 &952189837
 GameObject:
   m_ObjectHideFlags: 0
@@ -5355,6 +5379,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHover
   scaleMultiplier: 1.1
   speed: 10
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!1 &1098904415
 GameObject:
   m_ObjectHideFlags: 0
@@ -5630,6 +5657,7 @@ GameObject:
   - component: {fileID: 1110666780}
   - component: {fileID: 1110666779}
   - component: {fileID: 1110666778}
+  - component: {fileID: 1110666781}
   m_Layer: 5
   m_Name: TOP NORMAL
   m_TagString: Untagged
@@ -5751,6 +5779,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1110666776}
   m_CullTransparentMesh: 1
+--- !u!114 &1110666781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1110666776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c3d5a8f9c642314aa2ac8c475ea8953, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::transitionbuttonmenu
+  scaleMultiplier: 1.1
+  speed: 12
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!1 &1127606042
 GameObject:
   m_ObjectHideFlags: 0
@@ -5899,6 +5944,7 @@ GameObject:
   - component: {fileID: 1144862047}
   - component: {fileID: 1144862046}
   - component: {fileID: 1144862045}
+  - component: {fileID: 1144862048}
   m_Layer: 5
   m_Name: Back
   m_TagString: Untagged
@@ -6020,6 +6066,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1144862043}
   m_CullTransparentMesh: 1
+--- !u!114 &1144862048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1144862043}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c3d5a8f9c642314aa2ac8c475ea8953, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::transitionbuttonmenu
+  scaleMultiplier: 1.1
+  speed: 10
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!1 &1146408420
 GameObject:
   m_ObjectHideFlags: 0
@@ -6168,6 +6231,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHover
   scaleMultiplier: 1.1
   speed: 10
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!1 &1161374760
 GameObject:
   m_ObjectHideFlags: 0
@@ -6317,6 +6383,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHover
   scaleMultiplier: 1.1
   speed: 10
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!114 &1161374766
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6924,6 +6993,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHover
   scaleMultiplier: 1.1
   speed: 10
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!1 &1214796376
 GameObject:
   m_ObjectHideFlags: 0
@@ -7738,6 +7810,7 @@ GameObject:
   - component: {fileID: 1301528956}
   - component: {fileID: 1301528955}
   - component: {fileID: 1301528954}
+  - component: {fileID: 1301528957}
   m_Layer: 5
   m_Name: TOP HARD
   m_TagString: Untagged
@@ -7859,6 +7932,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1301528952}
   m_CullTransparentMesh: 1
+--- !u!114 &1301528957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1301528952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c3d5a8f9c642314aa2ac8c475ea8953, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::transitionbuttonmenu
+  scaleMultiplier: 1.1
+  speed: 12
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!1 &1388251768
 GameObject:
   m_ObjectHideFlags: 0
@@ -8408,6 +8498,7 @@ GameObject:
   - component: {fileID: 1442110524}
   - component: {fileID: 1442110523}
   - component: {fileID: 1442110526}
+  - component: {fileID: 1442110527}
   m_Layer: 5
   m_Name: Button_Setting
   m_TagString: Untagged
@@ -8543,6 +8634,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHover
   scaleMultiplier: 1.1
   speed: 10
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
+--- !u!114 &1442110527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1442110521}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c3d5a8f9c642314aa2ac8c475ea8953, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::transitionbuttonmenu
+  scaleMultiplier: 1.1
+  speed: 12
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 0}
+  volume: 1
 --- !u!1 &1448730543
 GameObject:
   m_ObjectHideFlags: 0
@@ -8691,6 +8802,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHover
   scaleMultiplier: 1.1
   speed: 10
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!1 &1490659769
 GameObject:
   m_ObjectHideFlags: 0
@@ -8839,6 +8953,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHover
   scaleMultiplier: 1.1
   speed: 10
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!1 &1491141179
 GameObject:
   m_ObjectHideFlags: 0
@@ -9301,6 +9418,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHover
   scaleMultiplier: 1.1
   speed: 10
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!1 &1543396738
 GameObject:
   m_ObjectHideFlags: 0
@@ -10150,6 +10270,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHover
   scaleMultiplier: 1.1
   speed: 10
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 0}
+  volume: 0.5
 --- !u!114 &1611996535
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10164,6 +10287,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHover
   scaleMultiplier: 1.1
   speed: 10
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!1 &1615167587
 GameObject:
   m_ObjectHideFlags: 0
@@ -10448,6 +10574,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHover
   scaleMultiplier: 1.1
   speed: 10
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!1 &1625742097
 GameObject:
   m_ObjectHideFlags: 0
@@ -11080,6 +11209,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHover
   scaleMultiplier: 1.1
   speed: 10
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!1 &1741286486
 GameObject:
   m_ObjectHideFlags: 0
@@ -12003,6 +12135,7 @@ GameObject:
   - component: {fileID: 2011509166}
   - component: {fileID: 2011509165}
   - component: {fileID: 2011509164}
+  - component: {fileID: 2011509167}
   m_Layer: 5
   m_Name: TOP EASY
   m_TagString: Untagged
@@ -12124,6 +12257,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2011509162}
   m_CullTransparentMesh: 1
+--- !u!114 &2011509167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2011509162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c3d5a8f9c642314aa2ac8c475ea8953, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::transitionbuttonmenu
+  scaleMultiplier: 1.1
+  speed: 12
+  hoverSound: {fileID: 8300000, guid: 99a479fda9f70e4419667a6a0f6427f1, type: 3}
+  clickSound: {fileID: 8300000, guid: 56f38a3e668b67b44ab68cec63efed66, type: 3}
+  volume: 1.5
 --- !u!1 &2034610697
 GameObject:
   m_ObjectHideFlags: 0
