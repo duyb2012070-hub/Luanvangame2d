@@ -15,6 +15,7 @@ public class PlayerCollision : MonoBehaviour
     public AudioSource coinSound;
     public AudioSource trapSound;
     public AudioSource heartSound;
+    public AudioSource jumpSound; // <--- THÊM MỚI: Kéo AudioSource nhảy vào đây
 
     private bool isDead = false;
 
@@ -30,12 +31,31 @@ public class PlayerCollision : MonoBehaviour
         if (!isDead && transform.position.y < fallLimit)
         {
             isDead = true;
-
-            if (trapSound != null)
-                trapSound.PlayOneShot(trapSound.clip);
+            PlaySfx(trapSound); // Sử dụng hàm dùng chung để kiểm tra SFX On/Off
 
             Invoke(nameof(PlayerFallDelay), 0.2f);
         }
+    }
+
+    // ==========================================
+    // --- HÀM PHÁT ÂM THANH DÙNG CHUNG ---
+    // ==========================================
+    void PlaySfx(AudioSource source)
+    {
+        // Kiểm tra xem người dùng có bật Sound trong Menu không
+        if (PlayerPrefs.GetInt("SfxOn", 1) == 1)
+        {
+            if (source != null && source.clip != null)
+            {
+                source.PlayOneShot(source.clip);
+            }
+        }
+    }
+
+    // Hàm này để PlayerController gọi sang khi nhảy
+    public void PlayJumpSfx()
+    {
+        PlaySfx(jumpSound);
     }
 
     // =========================
@@ -45,9 +65,7 @@ public class PlayerCollision : MonoBehaviour
     {
         if (collision.CompareTag("Coin"))
         {
-            if (coinSound != null)
-                coinSound.PlayOneShot(coinSound.clip);
-
+            PlaySfx(coinSound); // Kiểm tra SFX On/Off
             Destroy(collision.gameObject);
 
             if (gameManager != null)
@@ -56,9 +74,7 @@ public class PlayerCollision : MonoBehaviour
 
         if (collision.CompareTag("Heart"))
         {
-            if (heartSound != null)
-                heartSound.PlayOneShot(heartSound.clip);
-
+            PlaySfx(heartSound); // Kiểm tra SFX On/Off
             Destroy(collision.gameObject);
 
             if (gameManager != null)
@@ -73,50 +89,37 @@ public class PlayerCollision : MonoBehaviour
     {
         if (isDead) return;
 
-        // TRAP
         if (collision.gameObject.CompareTag("Trap"))
         {
             DamagePlayer();
             return;
         }
 
-        // ENEMY
         if (collision.gameObject.CompareTag("Enemy"))
         {
             foreach (ContactPoint2D contact in collision.contacts)
             {
-                // nếu player chạm từ trên xuống
                 if (contact.normal.y < -0.5f)
                 {
                     Bounce();
                     return;
                 }
             }
-
-            // nếu không phải đạp đầu → mất máu
             DamagePlayer();
         }
     }
 
-    // =========================
-    // BOUNCE
-    // =========================
     void Bounce()
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, bounceForce);
     }
 
-    // =========================
-    // DAMAGE
-    // =========================
     void DamagePlayer()
     {
         if (isDead) return;
-
         isDead = true;
 
-        if (trapSound != null)
-            trapSound.PlayOneShot(trapSound.clip);
+        PlaySfx(trapSound); // Kiểm tra SFX On/Off
 
         if (gameManager != null)
             gameManager.TakeDamage();
@@ -124,15 +127,10 @@ public class PlayerCollision : MonoBehaviour
         Invoke(nameof(ResetDeathState), 0.5f);
     }
 
-    // =========================
-    // FALL
-    // =========================
     void PlayerFallDelay()
     {
         if (GameManager.instance != null)
-        {
             GameManager.instance.PlayerFall();
-        }
 
         Invoke(nameof(ResetDeathState), 0.5f);
     }

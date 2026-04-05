@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody2D rb;
     private Animator anim;
+    private PlayerCollision playerCollision; // Thêm biến này để gọi âm thanh
 
     private bool isGrounded;
     private bool canDoubleJump;
@@ -21,6 +22,8 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        // Lấy script Collision nằm cùng trên nhân vật
+        playerCollision = GetComponent<PlayerCollision>();
     }
 
     void Update()
@@ -33,17 +36,8 @@ public class PlayerController : MonoBehaviour
 
     void CheckGround()
     {
-        bool groundHit = Physics2D.OverlapCircle(
-            groundCheck.position,
-            groundCheckRadius,
-            groundLayer
-        );
-
-        bool enemyHit = Physics2D.OverlapCircle(
-            groundCheck.position,
-            groundCheckRadius,
-            enemyLayer
-        );
+        bool groundHit = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+        bool enemyHit = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, enemyLayer);
 
         isGrounded = groundHit || enemyHit;
 
@@ -57,17 +51,10 @@ public class PlayerController : MonoBehaviour
     void HandleMovement()
     {
         float moveInput = Input.GetAxis("Horizontal");
-
         rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
 
-        if (moveInput > 0)
-        {
-            transform.localScale = new Vector3(1, 1, 1);
-        }
-        else if (moveInput < 0)
-        {
-            transform.localScale = new Vector3(-1, 1, 1);
-        }
+        if (moveInput > 0) transform.localScale = new Vector3(1, 1, 1);
+        else if (moveInput < 0) transform.localScale = new Vector3(-1, 1, 1);
 
         anim.SetBool("isRunning", moveInput != 0 && isGrounded);
     }
@@ -79,10 +66,14 @@ public class PlayerController : MonoBehaviour
             if (isGrounded)
             {
                 Jump();
+                // Gọi âm thanh nhảy từ script Collision
+                if (playerCollision != null) playerCollision.PlayJumpSfx();
             }
             else if (canDoubleJump)
             {
                 Jump();
+                // Gọi âm thanh nhảy đôi từ script Collision
+                if (playerCollision != null) playerCollision.PlayJumpSfx();
                 canDoubleJump = false;
             }
         }
@@ -102,11 +93,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // debug ground check
     void OnDrawGizmosSelected()
     {
         if (groundCheck == null) return;
-
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
     }

@@ -27,15 +27,13 @@ public class transitionbuttonmenu : MonoBehaviour, IPointerEnterHandler, IPointe
         normalScale = transform.localScale;
         hoverScale = normalScale * scaleMultiplier;
 
-        // Thiết lập AudioSource nội bộ (dùng cho Hover vì Hover không làm mất nút)
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
 
         audioSource.playOnAwake = false;
-        audioSource.spatialBlend = 0f; // 2D hoàn toàn
+        audioSource.spatialBlend = 0f;
         audioSource.ignoreListenerPause = true;
 
-        // Đăng ký sự kiện Click cho Button
         Button btn = GetComponent<Button>();
         if (btn != null)
         {
@@ -52,34 +50,33 @@ public class transitionbuttonmenu : MonoBehaviour, IPointerEnterHandler, IPointe
     // HÀM PHÁT ÂM THANH CLICK "BẤT TỬ"
     void PlayClickSound()
     {
-        if (clickSound != null)
+        // KIỂM TRA ĐIỀU KIỆN SFX TRƯỚC KHI PHÁT
+        if (clickSound != null && PlayerPrefs.GetInt("SfxOn", 1) == 1)
         {
-            // TẠO MỘT OBJECT TẠM THỜI ĐỂ PHÁT TIẾNG
-            // Cách này giúp âm thanh không bị ngắt khi nút ẩn đi hoặc chuyển Scene
             GameObject tempAudio = new GameObject("TempClickSound");
             AudioSource tempSource = tempAudio.AddComponent<AudioSource>();
 
-            // Cấu hình âm thanh to rõ nhất (2D)
             tempSource.clip = clickSound;
             tempSource.volume = volume;
-            tempSource.spatialBlend = 0f; // Ép về 2D
+            tempSource.spatialBlend = 0f;
             tempSource.playOnAwake = false;
             tempSource.ignoreListenerPause = true;
 
             tempSource.Play();
 
-            // Tự động xóa Object này sau khi clip chạy xong
             Destroy(tempAudio, clickSound.length + 0.1f);
-
-            Debug.Log("--- Đã phát Click bất tử trên: " + gameObject.name + " ---");
         }
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
         isHover = true;
-        if (hoverSound != null && audioSource != null)
+
+        // KIỂM TRA ĐIỀU KIỆN SFX TRƯỚC KHI PHÁT HOVER
+        if (hoverSound != null && audioSource != null && PlayerPrefs.GetInt("SfxOn", 1) == 1)
+        {
             audioSource.PlayOneShot(hoverSound, volume * 0.8f);
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)

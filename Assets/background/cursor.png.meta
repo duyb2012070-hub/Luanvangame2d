@@ -103,12 +103,12 @@ TextureImporter:
       name: cursor_0
       rect:
         serializedVersion: 2
-        x: 17
-        y: 8
-        width: 1005
-        height: 1011
+        x: 314
+        y: 264
+        width: 435
+        height: 492
       alignment: 9
-      pivot: {x: 0.3011694, y: 0.72992015}
+      pivot: {x: 0.0068030907, y: 0.9900646}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []

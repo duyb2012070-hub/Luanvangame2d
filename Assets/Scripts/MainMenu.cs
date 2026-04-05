@@ -2,6 +2,7 @@
 using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
+using System.Collections.Generic; // Cần thiết để dùng List
 
 public class MainMenu : MonoBehaviour
 {
@@ -13,7 +14,7 @@ public class MainMenu : MonoBehaviour
     public GameObject guidePanel;
     public GameObject achievementPanel;
     public GameObject noSaveWarningPanel;
-    public GameObject storyPanel; // <--- Thêm Panel Story ở đây
+    public GameObject storyPanel;
 
     [Header("--- Achievement Sub-Panels ---")]
     public GameObject achievementButtonsPanel;
@@ -22,10 +23,17 @@ public class MainMenu : MonoBehaviour
     [Header("--- Music Settings UI ---")]
     public AudioSource musicSource;
     public Image musicBtnImage;
-    public Sprite iconOn;
-    public Sprite iconOff;
+    public Sprite musicIconOn;
+    public Sprite musicIconOff;
 
-    [Header("--- Player Name ---")]
+    [Header("--- Sound Effect Settings UI ---")]
+    public Image sfxBtnImage;
+    public Sprite sfxIconOn;
+    public Sprite sfxIconOff;
+    // Thêm danh sách các AudioSource phát tiếng Button (Hover/Click)
+    public List<AudioSource> uiAudioSources = new List<AudioSource>();
+
+    [Header("--- Player Name Input ---")]
     public TMP_InputField nameInput;
 
     [Header("--- Scene Names ---")]
@@ -33,68 +41,128 @@ public class MainMenu : MonoBehaviour
     public string loadingSceneName = "LoadingSence";
 
     private bool isMusicOn = true;
+    private bool isSfxOn = true;
 
     void Start()
     {
         PlayerPrefs.SetInt("IsLoadingSave", 0);
+
+        // Load cấu hình âm thanh
         isMusicOn = PlayerPrefs.GetInt("MusicOn", 1) == 1;
+        isSfxOn = PlayerPrefs.GetInt("SfxOn", 1) == 1;
 
         ApplyAudioSettings();
+        ApplySfxSettings();
+
         ShowMainMenu();
 
         if (noSaveWarningPanel != null) noSaveWarningPanel.SetActive(false);
-        // Ẩn story panel khi bắt đầu
         if (storyPanel != null) storyPanel.SetActive(false);
     }
 
-    // --- LOGIC MỞ VÀ ĐÓNG STORY PANEL ---
+    // ==========================================
+    // --- HỆ THỐNG ÂM THANH (MUSIC & SFX) ---
+    // ==========================================
+
+    public void ToggleMusic()
+    {
+        isMusicOn = !isMusicOn;
+        PlayerPrefs.SetInt("MusicOn", isMusicOn ? 1 : 0);
+        PlayerPrefs.Save();
+        ApplyAudioSettings();
+    }
+
+    private void ApplyAudioSettings()
+    {
+        if (musicSource != null) musicSource.mute = !isMusicOn;
+        if (musicBtnImage != null && musicIconOn != null && musicIconOff != null)
+            musicBtnImage.sprite = isMusicOn ? musicIconOn : musicIconOff;
+    }
+
+    public void ToggleSfx()
+    {
+        isSfxOn = !isSfxOn;
+        PlayerPrefs.SetInt("SfxOn", isSfxOn ? 1 : 0);
+        PlayerPrefs.Save();
+        ApplySfxSettings();
+    }
+
+    private void ApplySfxSettings()
+    {
+        // 1. Cập nhật Icon nút bấm
+        if (sfxBtnImage != null && sfxIconOn != null && sfxIconOff != null)
+            sfxBtnImage.sprite = isSfxOn ? sfxIconOn : sfxIconOff;
+
+        // 2. Mute/Unmute toàn bộ AudioSource trong danh sách UI
+        foreach (AudioSource source in uiAudioSources)
+        {
+            if (source != null)
+            {
+                source.mute = !isSfxOn;
+            }
+        }
+    }
+
+    // ==========================================
+    // --- QUẢN LÝ PANEL & STORY ---
+    // ==========================================
+
     public void OpenStory()
     {
         HideAllPanels();
-        if (storyPanel != null)
-        {
-            storyPanel.SetActive(true);
-        }
+        if (storyPanel != null) storyPanel.SetActive(true);
     }
 
     public void BackFromStory()
     {
-        ShowMainMenu(); // Quay lại menu chính
+        ShowMainMenu();
     }
 
-    // --- LOGIC TIẾP TỤC GAME (CONTINUE) ---
+    private void HideAllPanels()
+    {
+        if (mainMenuPanel) mainMenuPanel.SetActive(false);
+        if (playMenuPanel) playMenuPanel.SetActive(false);
+        if (difficultyPanel) difficultyPanel.SetActive(false);
+        if (settingsPanel) settingsPanel.SetActive(false);
+        if (guidePanel) guidePanel.SetActive(false);
+        if (achievementPanel) achievementPanel.SetActive(false);
+        if (noSaveWarningPanel) noSaveWarningPanel.SetActive(false);
+        if (storyPanel) storyPanel.SetActive(false);
+    }
+
+    public void ShowMainMenu()
+    {
+        HideAllPanels();
+        if (mainMenuPanel) mainMenuPanel.SetActive(true);
+        if (achievementButtonsPanel) achievementButtonsPanel.SetActive(true);
+    }
+
+    // ==========================================
+    // --- LOGIC CHƠI GAME (CONTINUE & NEW) ---
+    // ==========================================
+
     public void ContinueGame()
     {
-        // 1. Lấy tên từ PlayerPrefs (đã được NameInputHandler cập nhật khi gõ)
         string pName = PlayerPrefs.GetString("playerName", "");
 
-        // 2. Nếu tên trống thì hiện cảnh báo ngay
         if (string.IsNullOrEmpty(pName))
         {
             if (noSaveWarningPanel != null) noSaveWarningPanel.SetActive(true);
             return;
         }
 
-        // 3. KIỂM TRA TRONG DATABASE (Bước quan trọng bị thiếu)
         if (CheckNameExists(pName))
         {
-            // Nếu có dữ liệu -> Cho phép vào game
             PlayerPrefs.SetInt("IsLoadingSave", 1);
             PlayerPrefs.Save();
             LoadWithLoadingScreen(gameSceneName);
         }
         else
         {
-            // Nếu KHÔNG có dữ liệu -> Hiện Panel thông báo lỗi
-            Debug.LogWarning("Không tìm thấy dữ liệu cho tên: " + pName);
-            if (noSaveWarningPanel != null)
-            {
-                noSaveWarningPanel.SetActive(true);
-            }
+            if (noSaveWarningPanel != null) noSaveWarningPanel.SetActive(true);
         }
     }
 
-    // Hàm phụ để kiểm tra DB (Giống bên NameInputHandler)
     private bool CheckNameExists(string nameToCheck)
     {
         if (DatabaseManager.db == null) return false;
@@ -107,31 +175,37 @@ public class MainMenu : MonoBehaviour
         catch { return false; }
     }
 
-    public void CloseNoSaveWarning()
+    public void StartEasy() { StartNewGame(0); }
+    public void StartNormal() { StartNewGame(1); }
+    public void StartHard() { StartNewGame(2); }
+
+    private void StartNewGame(int difficulty)
     {
-        if (noSaveWarningPanel != null) noSaveWarningPanel.SetActive(false);
+        PlayerPrefs.SetInt("IsLoadingSave", 0);
+        PlayerPrefs.SetInt("difficulty", difficulty);
+        string pName = (nameInput != null && !string.IsNullOrEmpty(nameInput.text)) ? nameInput.text : "Player";
+        PlayerPrefs.SetString("playerName", pName);
+        PlayerPrefs.Save();
+        LoadWithLoadingScreen(gameSceneName);
     }
 
-    private void HideAllPanels()
+    public void LoadWithLoadingScreen(string targetSceneName)
     {
-        if (mainMenuPanel) mainMenuPanel.SetActive(false);
-        if (playMenuPanel) playMenuPanel.SetActive(false);
-        if (difficultyPanel) difficultyPanel.SetActive(false);
-        if (settingsPanel) settingsPanel.SetActive(false);
-        if (guidePanel) guidePanel.SetActive(false);
-        if (achievementPanel) achievementPanel.SetActive(false);
-        if (noSaveWarningPanel) noSaveWarningPanel.SetActive(false);
-        if (storyPanel) storyPanel.SetActive(false); // Ẩn luôn story panel
+        LoadingManager.SceneToLoad = targetSceneName;
+        SceneManager.LoadScene(loadingSceneName);
     }
 
-    public void ShowMainMenu()
-    {
-        HideAllPanels();
-        if (mainMenuPanel) mainMenuPanel.SetActive(true);
-        if (achievementButtonsPanel) achievementButtonsPanel.SetActive(true);
-    }
+    // ==========================================
+    // --- CÁC PANEL PHỤ ---
+    // ==========================================
 
-    // --- CÁC HÀM CŨ GIỮ NGUYÊN ---
+    public void OpenPlayMenu() { HideAllPanels(); if (playMenuPanel) playMenuPanel.SetActive(true); }
+    public void OpenDifficulty() { HideAllPanels(); if (difficultyPanel) difficultyPanel.SetActive(true); }
+    public void OpenSettings() { HideAllPanels(); if (settingsPanel) settingsPanel.SetActive(true); }
+    public void OpenGuide() { HideAllPanels(); if (guidePanel) guidePanel.SetActive(true); }
+    public void BackToPlayMenu() { HideAllPanels(); if (playMenuPanel) playMenuPanel.SetActive(true); }
+    public void CloseNoSaveWarning() { if (noSaveWarningPanel != null) noSaveWarningPanel.SetActive(false); }
+
     public void OpenAchievement()
     {
         HideAllPanels();
@@ -157,47 +231,6 @@ public class MainMenu : MonoBehaviour
     {
         if (achievementButtonsPanel) achievementButtonsPanel.SetActive(true);
         if (achievementUI) achievementUI.ClearContent();
-    }
-
-    public void OpenPlayMenu() { HideAllPanels(); if (playMenuPanel) playMenuPanel.SetActive(true); }
-    public void OpenDifficulty() { HideAllPanels(); if (difficultyPanel) difficultyPanel.SetActive(true); }
-    public void OpenSettings() { HideAllPanels(); if (settingsPanel) settingsPanel.SetActive(true); }
-    public void OpenGuide() { HideAllPanels(); if (guidePanel) guidePanel.SetActive(true); }
-    public void BackToPlayMenu() { HideAllPanels(); if (playMenuPanel) playMenuPanel.SetActive(true); }
-
-    public void StartEasy() { StartNewGame(0); }
-    public void StartNormal() { StartNewGame(1); }
-    public void StartHard() { StartNewGame(2); }
-
-    private void StartNewGame(int difficulty)
-    {
-        PlayerPrefs.SetInt("IsLoadingSave", 0);
-        PlayerPrefs.SetInt("difficulty", difficulty);
-        string pName = (nameInput != null && !string.IsNullOrEmpty(nameInput.text)) ? nameInput.text : "Player";
-        PlayerPrefs.SetString("playerName", pName);
-        PlayerPrefs.Save();
-        LoadWithLoadingScreen(gameSceneName);
-    }
-
-    public void LoadWithLoadingScreen(string targetSceneName)
-    {
-        LoadingManager.SceneToLoad = targetSceneName;
-        SceneManager.LoadScene(loadingSceneName);
-    }
-
-    public void ToggleMusic()
-    {
-        isMusicOn = !isMusicOn;
-        PlayerPrefs.SetInt("MusicOn", isMusicOn ? 1 : 0);
-        PlayerPrefs.Save();
-        ApplyAudioSettings();
-    }
-
-    private void ApplyAudioSettings()
-    {
-        if (musicSource != null) musicSource.mute = !isMusicOn;
-        if (musicBtnImage != null && iconOn != null && iconOff != null)
-            musicBtnImage.sprite = isMusicOn ? iconOn : iconOff;
     }
 
     public void QuitGame() { Application.Quit(); }
