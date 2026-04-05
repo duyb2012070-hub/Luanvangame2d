@@ -65,24 +65,46 @@ public class MainMenu : MonoBehaviour
     // --- LOGIC TIẾP TỤC GAME (CONTINUE) ---
     public void ContinueGame()
     {
-        string pName = (nameInput != null && !string.IsNullOrEmpty(nameInput.text)) ? nameInput.text : "Player";
+        // 1. Lấy tên từ PlayerPrefs (đã được NameInputHandler cập nhật khi gõ)
+        string pName = PlayerPrefs.GetString("playerName", "");
 
-        if (AchievementManager.instance != null && AchievementManager.instance.CheckHasSaveData(pName))
+        // 2. Nếu tên trống thì hiện cảnh báo ngay
+        if (string.IsNullOrEmpty(pName))
         {
-            Debug.Log($"<color=green>📂 Tìm thấy dữ liệu cho: {pName}. Đang tải game...</color>");
-            PlayerPrefs.SetString("playerName", pName);
+            if (noSaveWarningPanel != null) noSaveWarningPanel.SetActive(true);
+            return;
+        }
+
+        // 3. KIỂM TRA TRONG DATABASE (Bước quan trọng bị thiếu)
+        if (CheckNameExists(pName))
+        {
+            // Nếu có dữ liệu -> Cho phép vào game
             PlayerPrefs.SetInt("IsLoadingSave", 1);
             PlayerPrefs.Save();
             LoadWithLoadingScreen(gameSceneName);
         }
         else
         {
-            Debug.LogWarning($"⚠️ Không tìm thấy dữ liệu lưu cho: {pName}");
+            // Nếu KHÔNG có dữ liệu -> Hiện Panel thông báo lỗi
+            Debug.LogWarning("Không tìm thấy dữ liệu cho tên: " + pName);
             if (noSaveWarningPanel != null)
             {
                 noSaveWarningPanel.SetActive(true);
             }
         }
+    }
+
+    // Hàm phụ để kiểm tra DB (Giống bên NameInputHandler)
+    private bool CheckNameExists(string nameToCheck)
+    {
+        if (DatabaseManager.db == null) return false;
+        try
+        {
+            var result = DatabaseManager.db.Table<SaveGameData>()
+                .Where(v => v.playerName.ToLower() == nameToCheck.ToLower()).FirstOrDefault();
+            return result != null;
+        }
+        catch { return false; }
     }
 
     public void CloseNoSaveWarning()

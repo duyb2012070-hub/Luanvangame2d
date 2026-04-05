@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
     private bool isContinueSession = false;
 
     private Vector3 lastCheckpointPos;
-    private bool hasReachedCheckpoint = false;
+    private bool hasReachedCheckpoint;
     #endregion
 
     #region KHỞI TẠO HỆ THỐNG
