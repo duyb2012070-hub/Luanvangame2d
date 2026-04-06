@@ -1,32 +1,39 @@
 ﻿using SQLite;
 
-// 🏆 BẢNG THÀNH TỰU (Lưu chỉ số kỷ lục)
+// 🏆 BẢNG THÀNH TỰU (Đã cập nhật PlayTime)
 public class AchievementData
 {
     [PrimaryKey, AutoIncrement]
     public int achievementID { get; set; }
 
     [Indexed]
-    public int sessionID { get; set; } // Liên kết với Session
+    public int sessionID { get; set; }
 
     public int coin { get; set; }
     public float distance { get; set; }
+
+    // GIỮ NGUYÊN để không lỗi các script đang truy cập HP
     public int hp { get; set; }
 
-    // ĐÃ SỬA: Chuyển float -> string để lưu "HH:mm:ss" không bị lỗi convert
+    // THÊM MỚI: Lưu tổng số giây đã chơi (Dùng để tính Top Time)
+    public float playTime { get; set; }
+
+    // Thời điểm thực hiện Save (Ví dụ: "06/04/2026 10:50")
     public string time { get; set; }
 }
 
-// 👤 BẢNG THÔNG TIN NGƯỜI CHƠI (Lưu trạng thái cuối cùng)
+// 👤 BẢNG THÔNG TIN NGƯỜI CHƠI
 public class PlayerData
 {
     [PrimaryKey]
     public string playerName { get; set; }
-    public string lastPosition { get; set; } // Lưu dạng "x,y,z"
+    public string lastPosition { get; set; }
     public int lastHP { get; set; }
+    // Có thể thêm playTime ở đây nếu muốn lưu tổng thời gian tích lũy của người chơi
+    public float totalPlayTime { get; set; }
 }
 
-// 🚩 BẢNG CHECKPOINT (Lưu các điểm đã đi qua)
+// 🚩 BẢNG CHECKPOINT
 public class CheckpointData
 {
     [PrimaryKey, AutoIncrement]
@@ -35,11 +42,11 @@ public class CheckpointData
     [Indexed]
     public int sessionID { get; set; }
 
-    public string position { get; set; } // "x,y,z"
+    public string position { get; set; }
     public string timeReached { get; set; }
 }
 
-// ⚙️ BẢNG CÀI ĐẶT (Lưu cấu hình theo từng người chơi)
+// ⚙️ BẢNG CÀI ĐẶT
 public class SettingsData
 {
     [PrimaryKey]
@@ -49,7 +56,7 @@ public class SettingsData
     public string resolution { get; set; }
 }
 
-// 🎮 BẢNG PHIÊN CHƠI (Bảng trung tâm liên kết mọi thứ)
+// 🎮 BẢNG PHIÊN CHƠI (Bảng trung tâm - Đã cập nhật PlayTime)
 public class GameSessionData
 {
     [PrimaryKey, AutoIncrement]
@@ -58,9 +65,12 @@ public class GameSessionData
     public int difficultyID { get; set; }
     public int score { get; set; }
 
-    // ĐÃ SỬA: Chuyển float -> string để đồng bộ với AchievementData
+    // Thời điểm lưu phiên chơi
     public string time { get; set; }
 
     public float distance { get; set; }
     public int currentHP { get; set; }
+
+    // THÊM MỚI: Thời gian đã trôi qua trong phiên chơi này
+    public float playTime { get; set; }
 }

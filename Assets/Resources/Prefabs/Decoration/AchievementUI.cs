@@ -14,14 +14,15 @@ public class AchievementUI : MonoBehaviour
     public UnityEngine.UI.Button normalButton;
     public UnityEngine.UI.Button hardButton;
 
-    // Class phụ để nhận dữ liệu từ câu lệnh JOIN SQL
+    // Class phụ để nhận dữ liệu từ câu lệnh JOIN SQL (ĐÃ CẬP NHẬT)
     public class AchievementViewModel
     {
         public string playerName { get; set; }
         public int coin { get; set; }
         public float distance { get; set; }
-        public int hp { get; set; }
-        public string time { get; set; }
+        // public int hp { get; set; } // ĐÃ XÓA
+        public float playTime { get; set; } // THÊM MỚI: Tổng thời gian đã chơi (giây)
+        public string time { get; set; }     // Thời điểm thực hiện save
         public int difficultyID { get; set; }
     }
 
@@ -29,12 +30,10 @@ public class AchievementUI : MonoBehaviour
     {
         ClearContent();
 
-        // Gắn sự kiện cho các nút
         if (easyButton != null) easyButton.onClick.AddListener(() => ShowTopByMode(0));
         if (normalButton != null) normalButton.onClick.AddListener(() => ShowTopByMode(1));
         if (hardButton != null) hardButton.onClick.AddListener(() => ShowTopByMode(2));
 
-        // Mặc định hiện Easy khi vừa mở
         ShowTopByMode(0);
     }
 
@@ -55,10 +54,10 @@ public class AchievementUI : MonoBehaviour
 
         ClearContent();
 
-        // CÂU LỆNH SQL JOIN CHUYÊN NGHIỆP:
-        // Lấy thông tin Achievement kết hợp với Session để có tên người chơi và độ khó
+        // CÂU LỆNH SQL JOIN (ĐÃ SỬA CỘT HP -> PLAYTIME)
+        // Lưu ý: Giả sử playTime nằm trong bảng AchievementData hoặc GameSessionData của bạn
         string sql = @"
-            SELECT s.playerName, a.coin, a.distance, a.hp, a.time, s.difficultyID 
+            SELECT s.playerName, a.coin, a.distance, a.playTime, a.time, s.difficultyID 
             FROM AchievementData a
             JOIN GameSessionData s ON a.sessionID = s.sessionID
             WHERE s.difficultyID = ?
@@ -82,20 +81,31 @@ public class AchievementUI : MonoBehaviour
             if (txt != null)
             {
                 string modeName = GetModeName(mode);
+                // Chuyển đổi giây sang định dạng MM:SS
+                string formattedPlayTime = FormatSeconds(data.playTime);
 
                 txt.text = $"<b>TOP {rank}</b>\n" +
                            $"NAME: {data.playerName}\n" +
                            $"COIN: {data.coin}\n" +
                            $"DIST: {data.distance:F1}m\n" +
-                           $"HP: {data.hp}\n" +
+                           $"PLAYED: {formattedPlayTime}\n" + // Hiển thị thời gian đã chơi
                            $"MODE: {modeName}\n" +
-                           $"TIME: {data.time}";
+                           $"DATE: {data.time}"; // Ngày giờ thực tế khi lưu
 
-                // Gợi ý: Nếu bạn muốn đổi màu text theo Rank
-                if (rank == 1) txt.color = Color.yellow; // Top 1 màu vàng
+                if (rank == 1) txt.color = Color.yellow;
+                else 
+               txt.color = new Color(0.8f, 0.5f, 0.2f);    // Đồng
             }
             rank++;
         }
+    }
+
+    // Hàm bổ trợ chuyển đổi giây -> Phút:Giây
+    private string FormatSeconds(float totalSeconds)
+    {
+        int mins = Mathf.FloorToInt(totalSeconds / 60);
+        int secs = Mathf.FloorToInt(totalSeconds % 60);
+        return string.Format("{0:00}:{1:00}", mins, secs);
     }
 
     private string GetModeName(int mode)

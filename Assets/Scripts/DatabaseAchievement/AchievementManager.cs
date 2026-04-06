@@ -23,20 +23,18 @@ public class AchievementManager : MonoBehaviour
     }
 
     // =====================================================
-    // 💾 HỆ THỐNG SAVE/LOAD TRẠNG THÁI (CHO NÚT SAVE & CONTINUE)
+    // 💾 HỆ THỐNG SAVE/LOAD TRẠNG THÁI (Lưu ngầm giữa trận)
     // =====================================================
-
     public void SaveCurrentGame(SaveGameData data)
     {
         if (DatabaseManager.db == null) return;
 
         try
         {
-            // TẠI ĐÂY: Dữ liệu 'data' (SaveGameData) VẪN CÓ trường 'health' 
-            // để người chơi Load game lại còn có máu để chơi tiếp.
+            // Xóa bản lưu cũ của người chơi này và chèn bản mới
             DatabaseManager.db.Execute("DELETE FROM SaveGameData WHERE playerName = ?", data.playerName);
             DatabaseManager.db.Insert(data);
-            Debug.Log($"💾 [Database] Đã lưu TRẠNG THÁI chơi cho {data.playerName}. Máu hiện tại: {data.health}");
+            Debug.Log($"💾 [Database] Đã lưu TRẠNG THÁI chơi cho {data.playerName}. Thời gian: {data.playTime}s");
         }
         catch (Exception e)
         {
@@ -61,9 +59,8 @@ public class AchievementManager : MonoBehaviour
     }
 
     // =====================================================
-    // 🏆 SAVE GAME END (LƯU KỶ LỤC KHI GAME OVER)
+    // 🏆 SAVE GAME END (Lưu kỷ lục khi GAME OVER)
     // =====================================================
-
     public void SaveGameEnd()
     {
         if (isSaved) return;
@@ -79,38 +76,44 @@ public class AchievementManager : MonoBehaviour
             int actualDifficulty = PlayerPrefs.GetInt("difficulty", 0);
             string pName = PlayerPrefs.GetString("playerName", "Player");
 
-            // BƯỚC A: TẠO VÀ LƯU SESSION (Lưu lại thông số tổng quát của ván chơi)
+            // Lấy thời gian từ playTimer của GameManager mà bạn đã sửa
+            float finalPlaySeconds = GameManager.instance.playTimer;
+
+            // BƯỚC A: LƯU SESSION (Thông tin tổng quát ván chơi)
             GameSessionData currentSession = new GameSessionData
             {
                 playerName = pName,
                 difficultyID = actualDifficulty,
                 score = GameManager.instance.score,
-                time = Time.timeSinceLevelLoad.ToString("F1") + "s",
+                // Lưu chuỗi để debug trong DB (ví dụ: "120.5s")
+                time = finalPlaySeconds.ToString("F1") + "s",
                 distance = (GameManager.instance.player != null) ? GameManager.instance.player.position.x : 0,
-                // Chỗ này bạn có thể giữ currentHP trong Session để log, 
-                // nhưng thường thì kết thúc game hp = 0 nên có thể bỏ qua.
                 currentHP = 0
             };
 
             DatabaseManager.db.Insert(currentSession);
             int generatedSessionID = currentSession.sessionID;
 
-            // BƯỚC B: TẠO VÀ LƯU ACHIEVEMENT (Bảng Thành Tựu/Kỷ Lục)
-            // ĐÃ XÓA TRƯỜNG 'hp' HOẶC 'health' Ở ĐÂY
+            // BƯỚC B: LƯU ACHIEVEMENT (Dữ liệu cho Bảng xếp hạng)
             AchievementData achievement = new AchievementData
             {
                 sessionID = generatedSessionID,
-                coin = currentSession.score,
+                coin = GameManager.instance.score,
                 distance = currentSession.distance,
-                // hp = ... (DÒNG NÀY ĐÃ BỊ XÓA VÌ KẾT THÚC GAME HP LUÔN = 0)
-                time = DateTime.Now.ToString("HH:mm:ss")
+                hp = 0, // Kết thúc game mặc định hp = 0
+
+                // 1. Lưu số giây thực tế để UI tính toán 00:00
+                playTime = finalPlaySeconds,
+
+                // 2. Lưu ngày giờ hệ thống để biết chơi khi nào
+                time = DateTime.Now.ToString("dd/MM/yyyy HH:mm")
             };
 
             int result = DatabaseManager.db.Insert(achievement);
 
             if (result > 0)
             {
-                Debug.Log($"✅ [Database] Đã lưu KỶ LỤC thành công (Không lưu máu vì đã chết).");
+                Debug.Log($"✅ [Database] Đã lưu KỶ LỤC: {finalPlaySeconds}s vào lúc {achievement.time}");
                 isSaved = true;
             }
         }
@@ -123,14 +126,13 @@ public class AchievementManager : MonoBehaviour
     // =====================================================
     // 📊 TRUY VẤN UI (DÙNG CHO BẢNG THÀNH TỰU)
     // =====================================================
-
     public List<AchievementDisplayModel> GetTopScoresByMode(int mode, int limit = 10)
     {
         if (DatabaseManager.db == null) return new List<AchievementDisplayModel>();
 
-        // Query này chỉ lấy Tên, Xu, Quãng đường, Thời gian để hiện lên bảng xếp hạng
+        // Lấy thêm trường playTime (số giây) và time (ngày giờ)
         string sql = @"
-            SELECT s.playerName, a.coin, a.distance, a.time 
+            SELECT s.playerName, a.coin, a.distance, a.playTime, a.time 
             FROM AchievementData a
             JOIN GameSessionData s ON a.sessionID = s.sessionID
             WHERE s.difficultyID = ?
@@ -143,37 +145,21 @@ public class AchievementManager : MonoBehaviour
     // =====================================================
     // 🔄 QUẢN LÝ FLAG & SCENE LOAD
     // =====================================================
+    public void ResetSave() { isSaved = false; }
 
-    public void ResetSave()
-    {
-        isSaved = false;
-    }
+    void OnEnable() { SceneManager.sceneLoaded += OnSceneLoaded; }
+    void OnDisable() { SceneManager.sceneLoaded -= OnSceneLoaded; }
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode) { ResetSave(); }
 
-    void OnEnable()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
-    void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        ResetSave();
-    }
     public bool CheckHasSaveData(string pName)
     {
         if (DatabaseManager.db == null) return false;
         try
         {
-            // Tìm xem có bản ghi nào trong bảng SaveGameData không
             var data = DatabaseManager.db.Table<SaveGameData>()
                 .Where(s => s.playerName == pName)
                 .FirstOrDefault();
-
-            return data != null; // Trả về true nếu có dữ liệu, false nếu không
+            return data != null;
         }
         catch (Exception e)
         {
@@ -183,11 +169,16 @@ public class AchievementManager : MonoBehaviour
     }
 }
 
-// Model hiển thị trên UI (Bảng xếp hạng) - Tuyệt đối không cần hp ở đây
+// Model hiển thị trên UI: Phải có đủ cả 2 loại thời gian
 public class AchievementDisplayModel
 {
     public string playerName { get; set; }
     public int coin { get; set; }
     public float distance { get; set; }
+
+    // Dùng để script UI format thành "02:30"
+    public float playTime { get; set; }
+
+    // Dùng để hiện ngày tháng "06/04/2026"
     public string time { get; set; }
 }

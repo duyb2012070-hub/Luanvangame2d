@@ -79,9 +79,16 @@ public class SaveGameData
 
     public int difficultyID { get; set; }
     public int score { get; set; }
-    public int health { get; set; }
+    public int health { get; set; } // GIỮ NGUYÊN để không lỗi script khác
     public int lives { get; set; }
+
+    // Thời điểm bấm lưu (Ví dụ: "06/04/2026 10:30")
     public string saveDate { get; set; }
+
+    // TỔNG THỜI GIAN ĐÃ CHƠI (Tính bằng giây, ví dụ: 120.5f)
+    // Thêm mới theo yêu cầu của bạn
+    public float playTime { get; set; }
+
     public string playerPosition { get; set; }
     public string mapDataJson { get; set; }
 }

@@ -27,7 +27,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI finalScoreText;
     public TextMeshProUGUI heartsText;
-    public TextMeshProUGUI multiplierText;  // Hiển thị X2, X3, X4
+    public TextMeshProUGUI multiplierText;
     public GameObject pausePanel;
     public GameObject gameOverPanel;
     public GameObject achievementPanel;
@@ -38,9 +38,11 @@ public class GameManager : MonoBehaviour
     public int maxHearts = 3;
     public int currentHearts;
 
-    [Header("--- Hệ số Quãng đường (Bảng 3.31) ---")]
-    private float startPosX;
+    [Header("--- Hệ thống Thời gian ---")]
+    public float playTimer; // Biến đếm tổng thời gian chơi (giây)
 
+    [Header("--- Hệ số Quãng đường ---")]
+    private float startPosX;
     private bool isPaused;
     private bool isGameOver = false;
     private bool isContinueSession = false;
@@ -60,13 +62,12 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         isGameOver = false;
+        playTimer = 0f; // Mặc định là 0
         InfiniteMapGenerator mapGen = FindFirstObjectByType<InfiniteMapGenerator>();
 
         if (pausePanel != null) pausePanel.SetActive(false);
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
         if (achievementPanel != null) achievementPanel.SetActive(false);
-
-        // ĐẢM BẢO: Luôn ẩn multiplierText khi bắt đầu game
         if (multiplierText != null) multiplierText.gameObject.SetActive(false);
 
         if (player != null)
@@ -98,6 +99,7 @@ public class GameManager : MonoBehaviour
     {
         isContinueSession = false;
         currentHearts = maxHearts;
+        playTimer = 0f; // Game mới bắt đầu từ 0 giây
         difficulty = PlayerPrefs.GetInt("difficulty", 0);
         if (mapGen != null) mapGen.InitializeMap(false);
     }
@@ -119,7 +121,10 @@ public class GameManager : MonoBehaviour
     #region VÒNG LẶP CẬP NHẬT
     void Update()
     {
-        if (isGameOver) return;
+        if (isGameOver || isPaused) return;
+
+        // Cập nhật bộ đếm thời gian mỗi giây
+        playTimer += Time.deltaTime;
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -130,15 +135,14 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
-    #region HỆ THỐNG ĐIỂM SỐ & MULTIPLIER (ĐÃ THÊM LOGIC ẨN)
+    #region HỆ THỐNG ĐIỂM SỐ & MULTIPLIER
     public int GetCurrentMultiplier()
     {
         if (player == null) return 1;
         float distance = player.position.x - startPosX;
-
         if (distance > 500) return 4;
         if (distance > 300) return 3;
-        if (distance > 100) return 2; 
+        if (distance > 100) return 2;
         return 1;
     }
 
@@ -146,14 +150,8 @@ public class GameManager : MonoBehaviour
     {
         int multiplier = GetCurrentMultiplier();
         score += amount * multiplier;
-
         UpdateScoreUI();
-
-        // CHỈ GỌI HIỂN THỊ KHI ĂN COIN (Hàm này được gọi từ PlayerCollision khi ăn coin)
-        if (multiplier > 1)
-        {
-            ShowAndHideMultiplier(multiplier);
-        }
+        if (multiplier > 1) ShowAndHideMultiplier(multiplier);
     }
 
     private void UpdateScoreUI()
@@ -161,29 +159,22 @@ public class GameManager : MonoBehaviour
         if (scoreText != null) scoreText.text = "Score " + score;
     }
 
-    // HÀM MỚI: Xử lý bật lên và tự ẩn sau 1 giây
     private void ShowAndHideMultiplier(int mult)
     {
         if (multiplierText == null) return;
-
-        // Reset bộ đếm ẩn nếu ăn coin liên tục
         CancelInvoke(nameof(DisableMultiplierUI));
-
         multiplierText.text = "X" + mult;
         multiplierText.gameObject.SetActive(true);
-
-        // Gọi hàm ẩn sau 1.0 giây
         Invoke(nameof(DisableMultiplierUI), 1.0f);
     }
 
     private void DisableMultiplierUI()
     {
-        if (multiplierText != null)
-            multiplierText.gameObject.SetActive(false);
+        if (multiplierText != null) multiplierText.gameObject.SetActive(false);
     }
     #endregion
 
-    #region SINH TỒN, DATABASE & UI (GIỮ NGUYÊN GỐC)
+    #region SINH TỒN & DATABASE
     public void TakeDamage()
     {
         if (isGameOver) return;
@@ -213,24 +204,11 @@ public class GameManager : MonoBehaviour
 
     public void SetCheckpoint(Vector3 pos) { lastCheckpointPos = pos; hasReachedCheckpoint = true; }
 
-    public void LoadToLastCheckpoint()
-    {
-        if (player == null) return;
-        isGameOver = false;
-        isPaused = false;
-        Time.timeScale = 1f;
-        player.position = lastCheckpointPos;
-        Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
-        if (rb != null) rb.linearVelocity = Vector2.zero;
-        if (gameOverPanel != null) gameOverPanel.SetActive(false);
-        if (pausePanel != null) pausePanel.SetActive(false);
-        UpdateHeartsUI();
-    }
-
     public void SaveGameToDatabase()
     {
         if (DatabaseManager.db == null || player == null) return;
         string pName = PlayerPrefs.GetString("playerName", "Player");
+
         SaveContainer container = new SaveContainer();
         SaveableItem[] itemsToSave = GameObject.FindObjectsByType<SaveableItem>((FindObjectsSortMode)0);
         foreach (SaveableItem item in itemsToSave)
@@ -242,16 +220,19 @@ public class GameManager : MonoBehaviour
                 rotation = item.transform.rotation
             });
         }
+
         SaveGameData newSave = new SaveGameData
         {
             playerName = pName,
             difficultyID = PlayerPrefs.GetInt("difficulty", 0),
             score = this.score,
             health = this.currentHearts,
+            playTime = this.playTimer, // LƯU THỜI GIAN VÀO DB TẠI ĐÂY
             playerPosition = $"{player.position.x}|{player.position.y}|{player.position.z}",
             mapDataJson = JsonUtility.ToJson(container),
             saveDate = System.DateTime.Now.ToString("dd/MM/yyyy HH:mm")
         };
+
         DatabaseManager.db.Execute("DELETE FROM SaveGameData WHERE playerName = ?", pName);
         DatabaseManager.db.Insert(newSave);
         ResumeGame();
@@ -262,18 +243,24 @@ public class GameManager : MonoBehaviour
         if (DatabaseManager.db == null) return false;
         string pName = PlayerPrefs.GetString("playerName", "Player");
         SaveGameData data = DatabaseManager.db.Table<SaveGameData>().Where(s => s.playerName == pName).FirstOrDefault();
+
         if (data == null) return false;
+
         SaveableItem[] oldItems = GameObject.FindObjectsByType<SaveableItem>((FindObjectsSortMode)0);
         foreach (SaveableItem item in oldItems) Destroy(item.gameObject);
+
         this.score = data.score;
         this.currentHearts = data.health;
         this.difficulty = data.difficultyID;
+        this.playTimer = data.playTime; // TẢI THỜI GIAN ĐÃ CHƠI TRƯỚC ĐÓ ĐỂ CHẠY TIẾP
+
         string[] pos = data.playerPosition.Split('|');
         if (pos.Length == 3 && player != null)
         {
             player.position = new Vector3(float.Parse(pos[0]), float.Parse(pos[1]), float.Parse(pos[2]));
             SetCheckpoint(player.position);
         }
+
         SaveContainer container = JsonUtility.FromJson<SaveContainer>(data.mapDataJson);
         if (container != null)
         {
@@ -303,7 +290,11 @@ public class GameManager : MonoBehaviour
     {
         if (isGameOver) return;
         isGameOver = true;
-        if (AchievementManager.instance != null) AchievementManager.instance.SaveGameEnd();
+
+        // Lưu vào bảng xếp hạng (Achievement)
+        if (AchievementManager.instance != null)
+            AchievementManager.instance.SaveGameEnd();
+
         if (isContinueSession && DatabaseManager.db != null)
         {
             string pName = PlayerPrefs.GetString("playerName", "Player");

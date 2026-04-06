@@ -1,101 +1,156 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class EnemyPatrol : MonoBehaviour
 {
     [Header("--- Movement Settings ---")]
-    public float speed = 2f;
+    public float patrolSpeed = 2f;
+    public float chaseSpeed = 4f; // Tốc độ khi đuổi theo player
     private bool movingRight = true;
+    private bool isWaiting = false;
 
-    [Header("--- Ground Check ---")]
-    // Vẫn để public để bạn có thể kéo thả trong Prefab nếu muốn
+    [Header("--- Detection Settings ---")]
     public Transform groundCheck;
     public float groundDistance = 1f;
+    public float wallDistance = 0.5f;
     public LayerMask groundLayer;
+
+    [Header("--- Player Chase Settings ---")]
+    public float detectRange = 5f; // Khoảng cách quái nhìn thấy Player
+    public LayerMask playerLayer; // Hãy tạo Layer "Player" và gán cho nhân vật
+    private Transform playerTransform;
+    private bool isChasing = false;
 
     private Rigidbody2D rb;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        // Tìm Player theo Tag (Đảm bảo nhân vật của bạn có Tag là "Player")
+        GameObject p = GameObject.FindGameObjectWithTag("Player");
+        if (p != null) playerTransform = p.transform;
     }
 
     void Start()
     {
-        // TỰ ĐỘNG TÌM groundCheck NẾU BỊ TRỐNG (Cực kỳ quan trọng khi Load Game)
         if (groundCheck == null)
         {
-            // Tìm đối tượng con có tên là "GroundCheck"
             groundCheck = transform.Find("GroundCheck");
-
-            // Nếu vẫn không tìm thấy bằng tên, lấy đối tượng con đầu tiên
             if (groundCheck == null && transform.childCount > 0)
-            {
                 groundCheck = transform.GetChild(0);
-            }
-        }
-
-        // Kiểm tra lại lần cuối để tránh lỗi Log liên tục
-        if (groundCheck == null)
-        {
-            Debug.LogError($"⚠️ [{gameObject.name}] Chưa gán GroundCheck! Hãy tạo một Object con tên là 'GroundCheck'.");
         }
     }
 
     void Update()
     {
-        // Nếu không có groundCheck thì không chạy logic để tránh báo lỗi Console
-        if (groundCheck == null) return;
+        if (groundCheck == null || isWaiting)
+        {
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+            return;
+        }
 
-        Move();
-        CheckGround();
+        CheckForPlayer();
+
+        if (isChasing)
+        {
+            ChasePlayer();
+        }
+        else
+        {
+            Move();
+            ScanObstacles();
+        }
+    }
+
+    void CheckForPlayer()
+    {
+        if (playerTransform == null) return;
+
+        // Tính khoảng cách giữa quái và Player
+        float distToPlayer = Vector2.Distance(transform.position, playerTransform.position);
+
+        // Kiểm tra xem Player có trong tầm mắt và cùng độ cao (trên cùng platform) không
+        bool sameLevel = Mathf.Abs(transform.position.y - playerTransform.position.y) < 1.5f;
+
+        if (distToPlayer <= detectRange && sameLevel)
+        {
+            isChasing = true;
+        }
+        else
+        {
+            isChasing = false;
+        }
+    }
+
+    void ChasePlayer()
+    {
+        // Xác định hướng về phía Player
+        float direction = playerTransform.position.x > transform.position.x ? 1 : -1;
+
+        // Quay mặt về phía Player
+        if ((direction > 0 && !movingRight) || (direction < 0 && movingRight))
+        {
+            Flip();
+        }
+
+        // Kiểm tra xem phía trước có vực hay tường không trước khi đuổi
+        RaycastHit2D groundHit = Physics2D.Raycast(groundCheck.position, Vector2.down, groundDistance, groundLayer);
+        Vector2 wallDir = movingRight ? Vector2.right : Vector2.left;
+        RaycastHit2D wallHit = Physics2D.Raycast(groundCheck.position, wallDir, wallDistance, groundLayer);
+
+        // Nếu gặp vực hoặc tường thì dừng lại không đuổi nữa (tránh rơi xuống vực)
+        if (groundHit.collider == null || wallHit.collider != null)
+        {
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+        }
+        else
+        {
+            rb.linearVelocity = new Vector2(direction * chaseSpeed, rb.linearVelocity.y);
+        }
     }
 
     void Move()
     {
-        // Sử dụng velocity để di chuyển 2D
         float dir = movingRight ? 1 : -1;
-        rb.linearVelocity = new Vector2(dir * speed, rb.linearVelocity.y);
+        rb.linearVelocity = new Vector2(dir * patrolSpeed, rb.linearVelocity.y);
     }
 
-    void CheckGround()
+    void ScanObstacles()
     {
-        // Bắn tia Raycast xuống dưới để kiểm tra mặt đất
-        RaycastHit2D hit = Physics2D.Raycast(
-            groundCheck.position,
-            Vector2.down,
-            groundDistance,
-            groundLayer
-        );
+        RaycastHit2D groundHit = Physics2D.Raycast(groundCheck.position, Vector2.down, groundDistance, groundLayer);
+        Vector2 wallDir = movingRight ? Vector2.right : Vector2.left;
+        RaycastHit2D wallHit = Physics2D.Raycast(groundCheck.position, wallDir, wallDistance, groundLayer);
 
-        // Nếu tia Raycast không chạm vào layer Ground -> Đến vực thẳm -> Quay đầu
-        if (hit.collider == null)
+        if (groundHit.collider == null || wallHit.collider != null)
         {
-            Flip();
+            StartCoroutine(WaitAndFlip());
         }
+    }
+
+    IEnumerator WaitAndFlip()
+    {
+        isWaiting = true;
+        yield return new WaitForSeconds(0.5f);
+        Flip();
+        isWaiting = false;
     }
 
     void Flip()
     {
         movingRight = !movingRight;
-
-        // Xoay hướng quái vật bằng cách đổi Scale X
         Vector3 scale = transform.localScale;
         scale.x *= -1;
         transform.localScale = scale;
-
-        // Lưu ý: Nếu bạn xoay quái, hãy đảm bảo GroundCheck là con của Quái 
-        // để nó cũng xoay theo sang phía trước đầu quái.
     }
 
-    // Vẽ đường tia Raycast trong Scene để bạn dễ căn chỉnh groundDistance
     void OnDrawGizmos()
     {
-        if (groundCheck == null) return;
+        // Vẽ tầm nhìn phát hiện Player (Vòng tròn xanh lá)
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, detectRange);
 
+        if (groundCheck == null) return;
         Gizmos.color = Color.red;
-        Gizmos.DrawLine(
-            groundCheck.position,
-            groundCheck.position + Vector3.down * groundDistance
-        );
+        Gizmos.DrawLine(groundCheck.position, groundCheck.position + Vector3.down * groundDistance);
     }
 }
