@@ -3406,6 +3406,7 @@ MonoBehaviour:
   sfxBtnImage: {fileID: 0}
   sfxIconOn: {fileID: 0}
   sfxIconOff: {fileID: 0}
+  uiAudioSources: []
   nameInput: {fileID: 1538429359}
   gameSceneName: game
   loadingSceneName: LoadingSence
@@ -4342,7 +4343,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -12.973572, y: 192.00879}
+  m_AnchoredPosition: {x: -12.973511, y: 192.00879}
   m_SizeDelta: {x: -1011.938, y: -646.9484}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &813719519
@@ -7485,7 +7486,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -1.5, y: 34.20398}
+  m_AnchoredPosition: {x: -1.5, y: 34.204}
   m_SizeDelta: {x: -3, y: 68.408}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1254701298
