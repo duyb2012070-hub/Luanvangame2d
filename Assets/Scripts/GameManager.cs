@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using UnityEngine.UI;
 using System.Collections.Generic;
 
 [System.Serializable]
@@ -12,10 +13,7 @@ public class SceneObjectData
 }
 
 [System.Serializable]
-public class SaveContainer
-{
-    public List<SceneObjectData> objects = new List<SceneObjectData>();
-}
+public class SaveContainer { public List<SceneObjectData> objects = new List<SceneObjectData>(); }
 
 public class GameManager : MonoBehaviour
 {
@@ -30,7 +28,12 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI multiplierText;
     public GameObject pausePanel;
     public GameObject gameOverPanel;
-    public GameObject achievementPanel;
+
+    [Header("--- Cấu hình Âm thanh (Audio) ---")]
+    public AudioSource backgroundMusic;
+    public List<AudioSource> sfxSources = new List<AudioSource>();
+    public Slider musicSlider;
+    public Slider sfxSlider;
 
     [Header("--- Chỉ số Sinh tồn ---")]
     public int score;
@@ -39,7 +42,7 @@ public class GameManager : MonoBehaviour
     public int currentHearts;
 
     [Header("--- Hệ thống Thời gian ---")]
-    public float playTimer; // Biến đếm tổng thời gian chơi (giây)
+    public float playTimer;
 
     [Header("--- Hệ số Quãng đường ---")]
     private float startPosX;
@@ -48,7 +51,6 @@ public class GameManager : MonoBehaviour
     private bool isContinueSession = false;
 
     private Vector3 lastCheckpointPos;
-    private bool hasReachedCheckpoint;
     #endregion
 
     #region KHỞI TẠO HỆ THỐNG
@@ -62,20 +64,19 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         isGameOver = false;
-        playTimer = 0f; // Mặc định là 0
         InfiniteMapGenerator mapGen = FindFirstObjectByType<InfiniteMapGenerator>();
 
-        if (pausePanel != null) pausePanel.SetActive(false);
-        if (gameOverPanel != null) gameOverPanel.SetActive(false);
-        if (achievementPanel != null) achievementPanel.SetActive(false);
-        if (multiplierText != null) multiplierText.gameObject.SetActive(false);
+        if (pausePanel) pausePanel.SetActive(false);
+        if (gameOverPanel) gameOverPanel.SetActive(false);
+        if (multiplierText) multiplierText.gameObject.SetActive(false);
 
         if (player != null)
         {
             lastCheckpointPos = player.position;
             startPosX = player.position.x;
-            hasReachedCheckpoint = true;
         }
+
+        InitVolumeSettings();
 
         if (PlayerPrefs.GetInt("IsLoadingSave", 0) == 1)
         {
@@ -86,6 +87,7 @@ public class GameManager : MonoBehaviour
             {
                 isContinueSession = true;
                 HandleMapGenerationAfterLoad(mapGen);
+                Debug.Log("Game Loaded! Time: " + playTimer);
             }
             else StartNewGameLogic(mapGen);
         }
@@ -99,43 +101,103 @@ public class GameManager : MonoBehaviour
     {
         isContinueSession = false;
         currentHearts = maxHearts;
-        playTimer = 0f; // Game mới bắt đầu từ 0 giây
+        playTimer = 0f;
         difficulty = PlayerPrefs.GetInt("difficulty", 0);
         if (mapGen != null) mapGen.InitializeMap(false);
     }
-
-    private void HandleMapGenerationAfterLoad(InfiniteMapGenerator mapGen)
-    {
-        if (player == null || mapGen == null) return;
-        float farthestX = player.position.x;
-        SaveableItem[] loadedItems = GameObject.FindObjectsByType<SaveableItem>((FindObjectsSortMode)0);
-        foreach (var item in loadedItems)
-        {
-            if (item.transform.position.x > farthestX) farthestX = item.transform.position.x;
-        }
-        mapGen.SetLastX(farthestX);
-        mapGen.InitializeMap(true);
-    }
     #endregion
 
-    #region VÒNG LẶP CẬP NHẬT
+    #region QUẢN LÝ ÂM THANH
+    private void InitVolumeSettings()
+    {
+        string musicKey = "MusicVolume";
+        string sfxKey = "SfxVolume";
+
+        if (!PlayerPrefs.HasKey(musicKey) || PlayerPrefs.GetFloat(musicKey) <= 0.001f)
+            PlayerPrefs.SetFloat(musicKey, 0.5f);
+
+        if (!PlayerPrefs.HasKey(sfxKey))
+            PlayerPrefs.SetFloat(sfxKey, 0.5f);
+
+        float mVol = PlayerPrefs.GetFloat(musicKey, 0.5f);
+        float sVol = PlayerPrefs.GetFloat(sfxKey, 0.5f);
+
+        if (musicSlider != null)
+        {
+            musicSlider.value = mVol;
+            musicSlider.onValueChanged.RemoveAllListeners();
+            musicSlider.onValueChanged.AddListener(OnMusicSliderChanged);
+        }
+
+        if (sfxSlider != null)
+        {
+            sfxSlider.value = sVol;
+            sfxSlider.onValueChanged.RemoveAllListeners();
+            sfxSlider.onValueChanged.AddListener(OnSfxSliderChanged);
+        }
+
+        ApplyMusicVolume(mVol);
+        ApplySfxVolume(sVol);
+        PlayerPrefs.Save();
+    }
+
+    public void OnMusicSliderChanged(float value) { ApplyMusicVolume(value); PlayerPrefs.SetFloat("MusicVolume", value); }
+    public void OnSfxSliderChanged(float value) { ApplySfxVolume(value); PlayerPrefs.SetFloat("SfxVolume", value); }
+    private void ApplyMusicVolume(float vol) { if (backgroundMusic != null) backgroundMusic.volume = vol; }
+    private void ApplySfxVolume(float vol) { foreach (var s in sfxSources) if (s != null) s.volume = vol; }
+    #endregion
+
+    #region ĐIỀU KHIỂN CHÍNH & CHECKPOINT
     void Update()
     {
-        if (isGameOver || isPaused) return;
-
-        // Cập nhật bộ đếm thời gian mỗi giây
-        playTimer += Time.deltaTime;
+        if (isGameOver) return;
+        if (!isPaused) playTimer += Time.deltaTime;
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (achievementPanel != null && achievementPanel.activeSelf) CloseAchievement();
-            else if (isPaused) ResumeGame();
+            if (isPaused) ResumeGame();
             else PauseGame();
+        }
+    }
+
+    public void SetCheckpoint(Vector3 pos) { lastCheckpointPos = pos; }
+
+    public void LoadToLastCheckpoint()
+    {
+        if (player != null)
+        {
+            player.position = lastCheckpointPos;
+            currentHearts = maxHearts;
+            isGameOver = false;
+            Time.timeScale = 1f;
+            if (gameOverPanel) gameOverPanel.SetActive(false);
+            if (pausePanel) pausePanel.SetActive(false);
+            UpdateHeartsUI();
         }
     }
     #endregion
 
-    #region HỆ THỐNG ĐIỂM SỐ & MULTIPLIER
+    #region SINH TỒN & ĐIỂM SỐ
+    public void AddScore(int amount)
+    {
+        int multiplier = GetCurrentMultiplier();
+        score += amount * multiplier;
+        UpdateScoreUI();
+        if (multiplier > 1) ShowAndHideMultiplier(multiplier);
+    }
+
+    public void AddHealth(int amount) { currentHearts = Mathf.Min(currentHearts + amount, maxHearts); UpdateHeartsUI(); }
+
+    public void TakeDamage()
+    {
+        if (isGameOver) return;
+        currentHearts--;
+        UpdateHeartsUI();
+        if (currentHearts <= 0) GameOver();
+    }
+
+    public void PlayerFall() { if (isGameOver) return; currentHearts = 0; UpdateHeartsUI(); GameOver(); }
+
     public int GetCurrentMultiplier()
     {
         if (player == null) return 1;
@@ -146,19 +208,6 @@ public class GameManager : MonoBehaviour
         return 1;
     }
 
-    public void AddScore(int amount)
-    {
-        int multiplier = GetCurrentMultiplier();
-        score += amount * multiplier;
-        UpdateScoreUI();
-        if (multiplier > 1) ShowAndHideMultiplier(multiplier);
-    }
-
-    private void UpdateScoreUI()
-    {
-        if (scoreText != null) scoreText.text = "Score " + score;
-    }
-
     private void ShowAndHideMultiplier(int mult)
     {
         if (multiplierText == null) return;
@@ -167,43 +216,10 @@ public class GameManager : MonoBehaviour
         multiplierText.gameObject.SetActive(true);
         Invoke(nameof(DisableMultiplierUI), 1.0f);
     }
-
-    private void DisableMultiplierUI()
-    {
-        if (multiplierText != null) multiplierText.gameObject.SetActive(false);
-    }
+    private void DisableMultiplierUI() => multiplierText.gameObject.SetActive(false);
     #endregion
 
-    #region SINH TỒN & DATABASE
-    public void TakeDamage()
-    {
-        if (isGameOver) return;
-        currentHearts--;
-        UpdateHeartsUI();
-        if (currentHearts <= 0) GameOver();
-    }
-
-    public void PlayerFall()
-    {
-        if (isGameOver) return;
-        currentHearts = 0;
-        UpdateHeartsUI();
-        GameOver();
-    }
-
-    public void AddHealth(int amount)
-    {
-        currentHearts = Mathf.Min(currentHearts + amount, maxHearts);
-        UpdateHeartsUI();
-    }
-
-    private void UpdateHeartsUI()
-    {
-        if (heartsText != null) heartsText.text = "HP: " + currentHearts;
-    }
-
-    public void SetCheckpoint(Vector3 pos) { lastCheckpointPos = pos; hasReachedCheckpoint = true; }
-
+    #region SQLITE
     public void SaveGameToDatabase()
     {
         if (DatabaseManager.db == null || player == null) return;
@@ -227,7 +243,7 @@ public class GameManager : MonoBehaviour
             difficultyID = PlayerPrefs.GetInt("difficulty", 0),
             score = this.score,
             health = this.currentHearts,
-            playTime = this.playTimer, // LƯU THỜI GIAN VÀO DB TẠI ĐÂY
+            playTime = this.playTimer,
             playerPosition = $"{player.position.x}|{player.position.y}|{player.position.z}",
             mapDataJson = JsonUtility.ToJson(container),
             saveDate = System.DateTime.Now.ToString("dd/MM/yyyy HH:mm")
@@ -243,20 +259,17 @@ public class GameManager : MonoBehaviour
         if (DatabaseManager.db == null) return false;
         string pName = PlayerPrefs.GetString("playerName", "Player");
         SaveGameData data = DatabaseManager.db.Table<SaveGameData>().Where(s => s.playerName == pName).FirstOrDefault();
-
         if (data == null) return false;
 
-        SaveableItem[] oldItems = GameObject.FindObjectsByType<SaveableItem>((FindObjectsSortMode)0);
-        foreach (SaveableItem item in oldItems) Destroy(item.gameObject);
+        foreach (var item in GameObject.FindObjectsByType<SaveableItem>((FindObjectsSortMode)0)) Destroy(item.gameObject);
 
         this.score = data.score;
         this.currentHearts = data.health;
-        this.difficulty = data.difficultyID;
-        this.playTimer = data.playTime; // TẢI THỜI GIAN ĐÃ CHƠI TRƯỚC ĐÓ ĐỂ CHẠY TIẾP
+        this.playTimer = data.playTime;
 
-        string[] pos = data.playerPosition.Split('|');
-        if (pos.Length == 3 && player != null)
+        if (player != null)
         {
+            string[] pos = data.playerPosition.Split('|');
             player.position = new Vector3(float.Parse(pos[0]), float.Parse(pos[1]), float.Parse(pos[2]));
             SetCheckpoint(player.position);
         }
@@ -270,60 +283,51 @@ public class GameManager : MonoBehaviour
                 if (prefab == null)
                 {
                     string[] folders = { "IsLands", "Coin", "enemy", "Platform", "Ground", "Trap", "Hearth", "Decoration", "CheckPoint" };
-                    foreach (string f in folders)
-                    {
-                        prefab = Resources.Load<GameObject>($"Prefabs/{f}/{item.prefabName}");
-                        if (prefab != null) break;
-                    }
+                    foreach (string f in folders) { prefab = Resources.Load<GameObject>($"Prefabs/{f}/{item.prefabName}"); if (prefab != null) break; }
                 }
-                if (prefab != null)
-                {
-                    GameObject obj = Instantiate(prefab, item.position, item.rotation);
-                    if (obj.GetComponent<SaveableItem>() == null) obj.AddComponent<SaveableItem>();
-                }
+                if (prefab != null) Instantiate(prefab, item.position, item.rotation).AddComponent<SaveableItem>();
             }
         }
         return true;
     }
+    #endregion
+
+    #region UI & SCENE
+    public void ResumeGame() { isPaused = false; Time.timeScale = 1f; if (pausePanel) pausePanel.SetActive(false); }
+    public void PauseGame() { if (isGameOver) return; isPaused = true; Time.timeScale = 0f; if (pausePanel) pausePanel.SetActive(true); }
 
     public void GameOver()
     {
         if (isGameOver) return;
         isGameOver = true;
 
-        // Lưu vào bảng xếp hạng (Achievement)
-        if (AchievementManager.instance != null)
-            AchievementManager.instance.SaveGameEnd();
+        // Vẫn gọi AchievementManager để cập nhật dữ liệu ngầm (nếu có)
+        if (AchievementManager.instance != null) AchievementManager.instance.SaveGameEnd();
 
         if (isContinueSession && DatabaseManager.db != null)
         {
             string pName = PlayerPrefs.GetString("playerName", "Player");
             DatabaseManager.db.Execute("DELETE FROM SaveGameData WHERE playerName = ?", pName);
         }
+
         Time.timeScale = 0f;
-        if (gameOverPanel != null) gameOverPanel.SetActive(true);
-        if (finalScoreText != null) finalScoreText.text = "Final Score: " + score;
+        if (gameOverPanel) gameOverPanel.SetActive(true);
+        if (finalScoreText) finalScoreText.text = "Final Score: " + score;
     }
 
-    public void PauseGame()
-    {
-        if (isGameOver) return;
-        isPaused = true;
-        Time.timeScale = 0f;
-        if (pausePanel != null) pausePanel.SetActive(true);
-    }
-
-    public void ResumeGame()
-    {
-        isPaused = false;
-        Time.timeScale = 1f;
-        if (pausePanel != null) pausePanel.SetActive(false);
-        if (achievementPanel != null) achievementPanel.SetActive(false);
-    }
-
-    public void OpenAchievement() { if (achievementPanel != null) achievementPanel.SetActive(true); if (pausePanel != null) pausePanel.SetActive(false); }
-    public void CloseAchievement() { if (achievementPanel != null) achievementPanel.SetActive(false); if (isGameOver) gameOverPanel.SetActive(true); else if (isPaused) pausePanel.SetActive(true); }
+    public void UpdateScoreUI() { if (scoreText) scoreText.text = "Score " + score; }
+    public void UpdateHeartsUI() { if (heartsText) heartsText.text = "HP: " + currentHearts; }
     public void RestartGame() { PlayerPrefs.SetInt("IsLoadingSave", 0); SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
     public void GoToMainMenu() { Time.timeScale = 1f; SceneManager.LoadScene("Main Menu"); }
     #endregion
+
+    private void HandleMapGenerationAfterLoad(InfiniteMapGenerator mapGen)
+    {
+        if (player == null || mapGen == null) return;
+        float farthestX = player.position.x;
+        foreach (var item in GameObject.FindObjectsByType<SaveableItem>((FindObjectsSortMode)0))
+            if (item.transform.position.x > farthestX) farthestX = item.transform.position.x;
+        mapGen.SetLastX(farthestX);
+        mapGen.InitializeMap(true);
+    }
 }

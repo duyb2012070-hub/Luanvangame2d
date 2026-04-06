@@ -2,7 +2,7 @@
 using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
-using System.Collections.Generic; // Cần thiết để dùng List
+using System.Collections.Generic;
 
 public class MainMenu : MonoBehaviour
 {
@@ -17,8 +17,8 @@ public class MainMenu : MonoBehaviour
     public GameObject storyPanel;
 
     [Header("--- Achievement Sub-Panels ---")]
-    public GameObject achievementButtonsPanel;
-    public AchievementUI achievementUI;
+    public GameObject achievementButtonsPanel; // Chứa 3 nút chọn Mode
+    public AchievementUI achievementUI;        // Script hiển thị danh sách điểm
 
     [Header("--- Music Settings UI ---")]
     public AudioSource musicSource;
@@ -30,7 +30,6 @@ public class MainMenu : MonoBehaviour
     public Image sfxBtnImage;
     public Sprite sfxIconOn;
     public Sprite sfxIconOff;
-    // Thêm danh sách các AudioSource phát tiếng Button (Hover/Click)
     public List<AudioSource> uiAudioSources = new List<AudioSource>();
 
     [Header("--- Player Name Input ---")]
@@ -45,25 +44,31 @@ public class MainMenu : MonoBehaviour
 
     void Start()
     {
+        // QUAN TRỌNG: Đảm bảo thời gian chạy bình thường (Fix lỗi GameTimer từ scene trước)
+        Time.timeScale = 1f;
+
         PlayerPrefs.SetInt("IsLoadingSave", 0);
 
         // Load cấu hình âm thanh
         isMusicOn = PlayerPrefs.GetInt("MusicOn", 1) == 1;
         isSfxOn = PlayerPrefs.GetInt("SfxOn", 1) == 1;
 
+        // Tự động điền tên cũ nếu có (Tiện lợi cho người dùng)
+        if (nameInput != null)
+            nameInput.text = PlayerPrefs.GetString("playerName", "");
+
         ApplyAudioSettings();
         ApplySfxSettings();
 
+        // Luôn bắt đầu tại Menu chính
         ShowMainMenu();
 
+        // Đảm bảo các bảng thông báo luôn ẩn lúc khởi đầu
         if (noSaveWarningPanel != null) noSaveWarningPanel.SetActive(false);
         if (storyPanel != null) storyPanel.SetActive(false);
     }
 
-    // ==========================================
-    // --- HỆ THỐNG ÂM THANH (MUSIC & SFX) ---
-    // ==========================================
-
+    #region HỆ THỐNG ÂM THANH
     public void ToggleMusic()
     {
         isMusicOn = !isMusicOn;
@@ -75,7 +80,7 @@ public class MainMenu : MonoBehaviour
     private void ApplyAudioSettings()
     {
         if (musicSource != null) musicSource.mute = !isMusicOn;
-        if (musicBtnImage != null && musicIconOn != null && musicIconOff != null)
+        if (musicBtnImage != null)
             musicBtnImage.sprite = isMusicOn ? musicIconOn : musicIconOff;
     }
 
@@ -89,35 +94,17 @@ public class MainMenu : MonoBehaviour
 
     private void ApplySfxSettings()
     {
-        // 1. Cập nhật Icon nút bấm
-        if (sfxBtnImage != null && sfxIconOn != null && sfxIconOff != null)
+        if (sfxBtnImage != null)
             sfxBtnImage.sprite = isSfxOn ? sfxIconOn : sfxIconOff;
 
-        // 2. Mute/Unmute toàn bộ AudioSource trong danh sách UI
         foreach (AudioSource source in uiAudioSources)
         {
-            if (source != null)
-            {
-                source.mute = !isSfxOn;
-            }
+            if (source != null) source.mute = !isSfxOn;
         }
     }
+    #endregion
 
-    // ==========================================
-    // --- QUẢN LÝ PANEL & STORY ---
-    // ==========================================
-
-    public void OpenStory()
-    {
-        HideAllPanels();
-        if (storyPanel != null) storyPanel.SetActive(true);
-    }
-
-    public void BackFromStory()
-    {
-        ShowMainMenu();
-    }
-
+    #region QUẢN LÝ PANEL UI (ẨN/HIỆN)
     private void HideAllPanels()
     {
         if (mainMenuPanel) mainMenuPanel.SetActive(false);
@@ -134,16 +121,27 @@ public class MainMenu : MonoBehaviour
     {
         HideAllPanels();
         if (mainMenuPanel) mainMenuPanel.SetActive(true);
+
+        // Reset trạng thái các nút Achievement khi quay về Menu chính
         if (achievementButtonsPanel) achievementButtonsPanel.SetActive(true);
     }
 
-    // ==========================================
-    // --- LOGIC CHƠI GAME (CONTINUE & NEW) ---
-    // ==========================================
+    public void OpenPlayMenu() { HideAllPanels(); if (playMenuPanel) playMenuPanel.SetActive(true); }
+    public void OpenDifficulty() { HideAllPanels(); if (difficultyPanel) difficultyPanel.SetActive(true); }
+    public void BackToPlayMenu() { HideAllPanels(); if (playMenuPanel) playMenuPanel.SetActive(true); }
+    public void OpenSettings() { HideAllPanels(); if (settingsPanel) settingsPanel.SetActive(true); }
+    public void OpenGuide() { HideAllPanels(); if (guidePanel) guidePanel.SetActive(true); }
+    public void OpenStory() { HideAllPanels(); if (storyPanel) storyPanel.SetActive(true); }
+    public void BackFromStory() => ShowMainMenu();
+    public void CloseNoSaveWarning() { if (noSaveWarningPanel != null) noSaveWarningPanel.SetActive(false); }
+    #endregion
 
+    #region LOGIC CHƠI GAME
     public void ContinueGame()
     {
-        string pName = PlayerPrefs.GetString("playerName", "");
+        string pName = (nameInput != null && !string.IsNullOrEmpty(nameInput.text))
+                       ? nameInput.text
+                       : PlayerPrefs.GetString("playerName", "");
 
         if (string.IsNullOrEmpty(pName))
         {
@@ -153,6 +151,7 @@ public class MainMenu : MonoBehaviour
 
         if (CheckNameExists(pName))
         {
+            PlayerPrefs.SetString("playerName", pName);
             PlayerPrefs.SetInt("IsLoadingSave", 1);
             PlayerPrefs.Save();
             LoadWithLoadingScreen(gameSceneName);
@@ -183,9 +182,11 @@ public class MainMenu : MonoBehaviour
     {
         PlayerPrefs.SetInt("IsLoadingSave", 0);
         PlayerPrefs.SetInt("difficulty", difficulty);
+
         string pName = (nameInput != null && !string.IsNullOrEmpty(nameInput.text)) ? nameInput.text : "Player";
         PlayerPrefs.SetString("playerName", pName);
         PlayerPrefs.Save();
+
         LoadWithLoadingScreen(gameSceneName);
     }
 
@@ -194,44 +195,44 @@ public class MainMenu : MonoBehaviour
         LoadingManager.SceneToLoad = targetSceneName;
         SceneManager.LoadScene(loadingSceneName);
     }
+    #endregion
 
-    // ==========================================
-    // --- CÁC PANEL PHỤ ---
-    // ==========================================
-
-    public void OpenPlayMenu() { HideAllPanels(); if (playMenuPanel) playMenuPanel.SetActive(true); }
-    public void OpenDifficulty() { HideAllPanels(); if (difficultyPanel) difficultyPanel.SetActive(true); }
-    public void OpenSettings() { HideAllPanels(); if (settingsPanel) settingsPanel.SetActive(true); }
-    public void OpenGuide() { HideAllPanels(); if (guidePanel) guidePanel.SetActive(true); }
-    public void BackToPlayMenu() { HideAllPanels(); if (playMenuPanel) playMenuPanel.SetActive(true); }
-    public void CloseNoSaveWarning() { if (noSaveWarningPanel != null) noSaveWarningPanel.SetActive(false); }
-
+    #region HỆ THỐNG ACHIEVEMENT (BẢNG XẾP HẠNG)
     public void OpenAchievement()
     {
         HideAllPanels();
         if (achievementPanel)
         {
             achievementPanel.SetActive(true);
+            // Đảm bảo hiện nút chọn Mode khi mở bảng
             if (achievementButtonsPanel) achievementButtonsPanel.SetActive(true);
             if (achievementUI) achievementUI.ClearContent();
         }
     }
 
-    public void OpenAchievementEasy() { ShowAchievementByMode(0); }
-    public void OpenAchievementNormal() { ShowAchievementByMode(1); }
-    public void OpenAchievementHard() { ShowAchievementByMode(2); }
+    public void OpenAchievementEasy() => ShowAchievementByMode(0);
+    public void OpenAchievementNormal() => ShowAchievementByMode(1);
+    public void OpenAchievementHard() => ShowAchievementByMode(2);
 
     private void ShowAchievementByMode(int mode)
     {
+        // Ẩn nút Mode để hiện danh sách điểm
         if (achievementButtonsPanel) achievementButtonsPanel.SetActive(false);
         if (achievementUI) achievementUI.ShowTopByMode(mode);
     }
 
     public void BackFromTopScores()
     {
+        // Hiện lại nút Mode và dọn dẹp danh sách
         if (achievementButtonsPanel) achievementButtonsPanel.SetActive(true);
         if (achievementUI) achievementUI.ClearContent();
     }
 
-    public void QuitGame() { Application.Quit(); }
+    public void BackFromAchievement()
+    {
+        ShowMainMenu();
+    }
+    #endregion
+
+    public void QuitGame() => Application.Quit();
 }
