@@ -50,10 +50,13 @@ public class InfiniteMapGenerator : MonoBehaviour
 
     #region KHỞI TẠO (INITIALIZATION)
 
+    /// <summary>
+    /// Đồng bộ mốc X cuối cùng từ Database để Generator biết cần xây tiếp từ đâu.
+    /// </summary>
     public void SetLastX(float x)
     {
         this.lastX = x;
-        Debug.Log("🏁 Generator tiếp tục sinh từ mốc X: " + lastX);
+        Debug.Log("<color=cyan>🏁 Generator tiếp nối từ X: </color>" + lastX);
     }
 
     public void InitializeMap(bool loadingFromSave)
@@ -63,13 +66,13 @@ public class InfiniteMapGenerator : MonoBehaviour
         ApplyDifficulty();
         SpawnLeftBlockFixed();
 
-        // Tính toán tọa độ Background ban đầu
+        // Tính toán tọa độ Background ban đầu theo vị trí hiện tại
         int currentTileIndex = Mathf.FloorToInt(player.position.x / backgroundWidth);
         bgLastX = (currentTileIndex - 2) * backgroundWidth;
 
         if (!isLoadedFromSave)
         {
-            // CHẾ ĐỘ CHƠI MỚI
+            // --- CHẾ ĐỘ CHƠI MỚI ---
             lastX = player.position.x;
             lastY = player.position.y - 2f;
 
@@ -83,8 +86,11 @@ public class InfiniteMapGenerator : MonoBehaviour
         }
         else
         {
-            // CHẾ ĐỘ LOAD SAVE
+            // --- CHẾ ĐỘ LOAD SAVE ---
+            // Không sinh Tile mới ngay lập tức vì đã có dữ liệu từ Database nạp vào.
             lastY = player.position.y - 2f;
+
+            // Chỉ sinh phông nền lấp đầy tầm mắt
             while (bgLastX < player.position.x + spawnDistance)
             {
                 SpawnBackground();
@@ -103,13 +109,13 @@ public class InfiniteMapGenerator : MonoBehaviour
     {
         if (!mapStarted || player == null) return;
 
-        // Sinh thêm địa hình khi người chơi tiến tới gần giới hạn
+        // Sinh thêm địa hình khi người chơi tiến tới gần giới hạn cuối cùng
         if (player.position.x + spawnDistance > lastX)
         {
             GenerateTile();
         }
 
-        // Sinh thêm phông nền theo lưới tọa độ
+        // Sinh thêm phông nền
         if (player.position.x + spawnDistance > bgLastX)
         {
             SpawnBackground();
@@ -130,7 +136,7 @@ public class InfiniteMapGenerator : MonoBehaviour
 
         GameObject bgPrefab = backgroundPrefabs[prefabIndex];
 
-        // Sinh 3 tầng dọc (Trên - Giữa - Dưới)
+        // Sinh 3 tầng dọc (Để tránh khoảng trống khi Player nhảy quá cao hoặc rơi tự do)
         GameObject mid = Instantiate(bgPrefab, new Vector3(spawnX, 0, 10), Quaternion.identity);
         float h = mid.GetComponent<SpriteRenderer>().bounds.size.y;
 
@@ -142,6 +148,7 @@ public class InfiniteMapGenerator : MonoBehaviour
 
     void SpawnLeftBlockFixed()
     {
+        // Chặn người chơi đi ngược ra khỏi map ban đầu
         if (leftBlockPrefab == null || GameObject.Find("LeftBlockFixed")) return;
 
         Vector3 fixedPos = new Vector3(-6f, 0f, 0f);
@@ -159,6 +166,7 @@ public class InfiniteMapGenerator : MonoBehaviour
         float gap = Random.Range(minGap, maxGap);
         lastX += gap;
 
+        // Giới hạn độ cao dao động để map không quá dốc
         float height = Mathf.Clamp(lastY + Random.Range(-1.5f, 1.5f), -1f, 3f);
         Vector3 spawnPos = new Vector3(lastX, height, 0);
 
@@ -166,7 +174,7 @@ public class InfiniteMapGenerator : MonoBehaviour
         GameObject tile = null;
         bool isGround = false;
 
-        // Phân loại tile
+        // Phân loại tile dựa trên xác suất
         if (type < 50)
         {
             tile = SpawnPrefab(groundPrefabs, spawnPos);
@@ -178,7 +186,7 @@ public class InfiniteMapGenerator : MonoBehaviour
         }
         else if (type < 80 + islandChance)
         {
-            spawnPos.y += 2.5f;
+            spawnPos.y += 2.5f; // Đảo bay thường cao hơn
             tile = SpawnPrefab(islandPrefabs, spawnPos);
         }
         else
@@ -188,12 +196,15 @@ public class InfiniteMapGenerator : MonoBehaviour
 
         if (tile == null) return;
 
+        // Đảm bảo Tile có script để lưu trữ
+        EnsureSaveable(tile);
+
         float topY = tile.GetComponent<Collider2D>().bounds.max.y;
 
-        // Sinh vật phẩm và bẫy
+        // Logic sinh vật thể bổ trợ
         bool trapSpawned = SpawnTrap(tile, topY);
 
-        if (!trapSpawned)
+        if (!trapSpawned) // Nếu không có bẫy thì mới sinh quái hoặc tiền để tránh quá dày
         {
             SpawnEnemy(tile, topY);
             SpawnCoinPattern(tile, topY);
@@ -209,7 +220,9 @@ public class InfiniteMapGenerator : MonoBehaviour
     {
         if (groundPrefabs.Length == 0) return;
         Vector3 pos = new Vector3(player.position.x, player.position.y - 2f, 0);
-        Instantiate(groundPrefabs[0], pos, Quaternion.identity);
+        GameObject startObj = Instantiate(groundPrefabs[0], pos, Quaternion.identity);
+
+        EnsureSaveable(startObj);
 
         lastX = pos.x;
         lastY = pos.y;
@@ -217,8 +230,17 @@ public class InfiniteMapGenerator : MonoBehaviour
 
     GameObject SpawnPrefab(GameObject[] list, Vector3 pos)
     {
-        if (list.Length == 0) return null;
+        if (list == null || list.Length == 0) return null;
         return Instantiate(list[Random.Range(0, list.Length)], pos, Quaternion.identity);
+    }
+
+    // Tự động gán SaveableItem nếu chưa có để hệ thống SQLite nhận diện
+    void EnsureSaveable(GameObject obj)
+    {
+        if (obj != null && obj.GetComponent<SaveableItem>() == null)
+        {
+            obj.AddComponent<SaveableItem>();
+        }
     }
 
     #endregion
@@ -233,9 +255,10 @@ public class InfiniteMapGenerator : MonoBehaviour
             return false;
         }
 
-        float x = Random.Range(tile.GetComponent<Collider2D>().bounds.min.x + 1f, tile.GetComponent<Collider2D>().bounds.max.x - 1f);
-        Instantiate(trapPrefabs[Random.Range(0, trapPrefabs.Length)], new Vector3(x, topY + Random.Range(5f, 7f), 0), Quaternion.identity);
+        float x = Random.Range(tile.GetComponent<Collider2D>().bounds.min.x + 0.5f, tile.GetComponent<Collider2D>().bounds.max.x - 0.5f);
+        GameObject trap = Instantiate(trapPrefabs[Random.Range(0, trapPrefabs.Length)], new Vector3(x, topY + Random.Range(5f, 7f), 0), Quaternion.identity);
 
+        EnsureSaveable(trap);
         trapCooldown = 2;
         return true;
     }
@@ -249,8 +272,9 @@ public class InfiniteMapGenerator : MonoBehaviour
         }
 
         float x = Random.Range(tile.GetComponent<Collider2D>().bounds.min.x + 1f, tile.GetComponent<Collider2D>().bounds.max.x - 1f);
-        Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Length)], new Vector3(x, topY + Random.Range(5f, 7f), 0), Quaternion.identity);
+        GameObject enemy = Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Length)], new Vector3(x, topY + Random.Range(5f, 7f), 0), Quaternion.identity);
 
+        EnsureSaveable(enemy);
         enemyCooldown = 2;
     }
 
@@ -277,16 +301,20 @@ public class InfiniteMapGenerator : MonoBehaviour
         }
 
         float x = Random.Range(tile.GetComponent<Collider2D>().bounds.min.x + 1f, tile.GetComponent<Collider2D>().bounds.max.x - 1f);
-        Instantiate(heartPrefab, new Vector3(x, topY + 3f, 0), Quaternion.identity);
+        GameObject heart = Instantiate(heartPrefab, new Vector3(x, topY + 3f, 0), Quaternion.identity);
 
-        heartCooldown = 5; // Tránh spam máu liên tục
+        EnsureSaveable(heart);
+        heartCooldown = 5;
     }
 
     void SpawnCheckpoint(GameObject tile, bool isGround, bool trapSpawned, float topY)
     {
+        // Chỉ sinh checkpoint trên đất liền, không có bẫy và cách nhau tối thiểu 60 đơn vị
         if (checkpointPrefab == null || !isGround || trapSpawned || lastX - lastCheckpointX < 60f) return;
 
-        Instantiate(checkpointPrefab, new Vector3(tile.transform.position.x, topY + 1.2f, 0), Quaternion.identity);
+        GameObject cp = Instantiate(checkpointPrefab, new Vector3(tile.transform.position.x, topY + 1.2f, 0), Quaternion.identity);
+
+        EnsureSaveable(cp);
         lastCheckpointX = lastX;
     }
 
@@ -296,35 +324,29 @@ public class InfiniteMapGenerator : MonoBehaviour
 
     void SpawnCoinLine(float x, float y)
     {
-        for (int i = -3; i <= 3; i++)
+        for (int i = -2; i <= 2; i++)
             Instantiate(coinPrefab, new Vector3(x + i * 0.8f, y, 0), Quaternion.identity);
     }
 
     void SpawnCoinArc(float x, float y)
     {
-        for (int i = -3; i <= 3; i++)
-            Instantiate(coinPrefab, new Vector3(x + i * 0.8f, y + Mathf.Abs(i) * 0.6f, 0), Quaternion.identity);
+        for (int i = -2; i <= 2; i++)
+            Instantiate(coinPrefab, new Vector3(x + i * 0.8f, y + (2 - Mathf.Abs(i)) * 0.5f, 0), Quaternion.identity);
     }
 
     void SpawnCoinTriangle(float x, float y)
     {
-        Instantiate(coinPrefab, new Vector3(x, y + 2f, 0), Quaternion.identity);
-        Instantiate(coinPrefab, new Vector3(x - 0.8f, y + 1f, 0), Quaternion.identity);
-        Instantiate(coinPrefab, new Vector3(x + 0.8f, y + 1f, 0), Quaternion.identity);
-        Instantiate(coinPrefab, new Vector3(x - 1.6f, y, 0), Quaternion.identity);
-        Instantiate(coinPrefab, new Vector3(x, y, 0), Quaternion.identity);
-        Instantiate(coinPrefab, new Vector3(x + 1.6f, y, 0), Quaternion.identity);
+        Instantiate(coinPrefab, new Vector3(x, y + 1.5f, 0), Quaternion.identity);
+        Instantiate(coinPrefab, new Vector3(x - 0.6f, y + 0.5f, 0), Quaternion.identity);
+        Instantiate(coinPrefab, new Vector3(x + 0.6f, y + 0.5f, 0), Quaternion.identity);
     }
 
     void SpawnCoinDiamond(float x, float y)
     {
-        Instantiate(coinPrefab, new Vector3(x, y + 2f, 0), Quaternion.identity);
-        Instantiate(coinPrefab, new Vector3(x - 0.8f, y + 1f, 0), Quaternion.identity);
-        Instantiate(coinPrefab, new Vector3(x + 0.8f, y + 1f, 0), Quaternion.identity);
-        Instantiate(coinPrefab, new Vector3(x, y, 0), Quaternion.identity);
-        Instantiate(coinPrefab, new Vector3(x - 0.8f, y - 1f, 0), Quaternion.identity);
-        Instantiate(coinPrefab, new Vector3(x + 0.8f, y - 1f, 0), Quaternion.identity);
-        Instantiate(coinPrefab, new Vector3(x, y - 2f, 0), Quaternion.identity);
+        Instantiate(coinPrefab, new Vector3(x, y + 1.2f, 0), Quaternion.identity);
+        Instantiate(coinPrefab, new Vector3(x - 0.8f, y, 0), Quaternion.identity);
+        Instantiate(coinPrefab, new Vector3(x + 0.8f, y, 0), Quaternion.identity);
+        Instantiate(coinPrefab, new Vector3(x, y - 1.2f, 0), Quaternion.identity);
     }
 
     #endregion
@@ -335,35 +357,24 @@ public class InfiniteMapGenerator : MonoBehaviour
     {
         int d = PlayerPrefs.GetInt("difficulty", 0);
 
+        // Các thông số được cân bằng lại để phù hợp với gameplay
         if (d == 0) // EASY
         {
-            minGap = 2.5f;
-            maxGap = 4f;
-            trapChance = 5;
-            enemyChance = 10;
-            islandChance = 10;
-            coinChance = 40;
-            heartChance = 8;
+            minGap = 2.5f; maxGap = 3.5f;
+            trapChance = 5; enemyChance = 10; islandChance = 15;
+            coinChance = 50; heartChance = 10;
         }
         else if (d == 1) // NORMAL
         {
-            minGap = 3.5f;
-            maxGap = 5.5f;
-            trapChance = 25;
-            enemyChance = 30;
-            islandChance = 20;
-            coinChance = 30;
-            heartChance = 12;
+            minGap = 3.5f; maxGap = 5f;
+            trapChance = 20; enemyChance = 25; islandChance = 20;
+            coinChance = 35; heartChance = 12;
         }
         else // HARD
         {
-            minGap = 4.5f;
-            maxGap = 6f;
-            trapChance = 65;
-            enemyChance = 55;
-            islandChance = 40;
-            coinChance = 20;
-            heartChance = 5;
+            minGap = 4.5f; maxGap = 6.5f;
+            trapChance = 50; enemyChance = 45; islandChance = 30;
+            coinChance = 20; heartChance = 5;
         }
     }
 
